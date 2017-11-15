@@ -18,12 +18,14 @@ import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
+import com.github.salomonbrys.kodein.instance
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 import com.google.common.base.Preconditions.checkNotNull
+import com.google.gson.Gson
 
 /**
  * Created by chsc on 08.11.17.
@@ -171,7 +173,7 @@ private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
     private fun parseResponseToPostElements(response: ResponseBody): List<RedditPostElement> {
         var redditPostElements: List<RedditPostElement>? = null
         try {
-            redditPostElements = Injection.gson.fromJson<List<RedditPostElement>>(response.string(), Injection.type)
+            redditPostElements = Injection.kodein.instance<Gson>().fromJson<List<RedditPostElement>>(response.string(), Injection.type)
         } catch (e: IOException) {
            Log.e(TAG,"Error while parsing respone $e")
         }

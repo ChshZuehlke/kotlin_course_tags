@@ -9,7 +9,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-alpha4'
+        classpath 'com.android.tools.build:gradle:3.0.0-alpha5'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -30,6 +30,7 @@ ext{
     guavaVersion = '18.0'
     picasso_version = '2.5.2'
     retrofit_version = '2.0.0'
+    kodein_version = '4.1.0'
 }
 
 task clean(type: Delete) {

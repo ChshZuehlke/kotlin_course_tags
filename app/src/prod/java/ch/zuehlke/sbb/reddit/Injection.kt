@@ -18,6 +18,7 @@ import ch.zuehlke.sbb.reddit.data.source.remote.RedditNewsDataRemoteDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.github.salomonbrys.kodein.*
 
 
 import com.google.common.base.Preconditions.checkNotNull
@@ -28,46 +29,39 @@ import com.google.common.base.Preconditions.checkNotNull
  */
 object Injection {
 
-    private val REDDIT_END_POINT = "https://www.reddit.com/r/dota2/"
+    val kodein = Kodein{
 
-    private var redditAPI: RedditAPI? = null
-    private var retrofit: Retrofit? = null
+        bind<Retrofit>() with singleton {
+            val gson = GsonBuilder()
+                    .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .registerTypeAdapterFactory(elementTypeAdapterFactory)
+                    .create()
+            Retrofit.Builder()
+                    .baseUrl(REDDIT_END_POINT)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build()
+        }
+
+        bind<RedditAPI>() with singleton { instance<Retrofit>().create<RedditAPI>(RedditAPI::class.java!!)  }
+
+        bind<Gson>() with singleton {
+            GsonBuilder()
+                .registerTypeAdapterFactory(elementTypeAdapterFactory)
+                .create()
+        }
+    }
+
+    private val REDDIT_END_POINT = "https://www.reddit.com/r/dota2/"
 
     val type = object : TypeToken<List<RedditPostElement>>() {
 
     }.type
 
-    val gson = GsonBuilder()
-            .registerTypeAdapterFactory(elementTypeAdapterFactory)
-            .create()
-
     fun provideRedditNewsRepository(context: Context): RedditRepository {
         checkNotNull(context)
-        return RedditRepository.getInstance(RedditNewsDataRemoteDataSource.getInstance(context, getRedditAPI(retroFit)),
+        return RedditRepository.getInstance(RedditNewsDataRemoteDataSource.getInstance(context, kodein.instance()),
                 RedditNewsLocalDataSource.getInstance(context), context)
     }
 
-    fun getRedditAPI(retrofit: Retrofit): RedditAPI {
-        if (redditAPI == null) {
-            redditAPI = retrofit.create<RedditAPI>(RedditAPI::class.java!!)
-        }
-        return redditAPI!!
-    }
-
-    val retroFit: Retrofit
-        get() {
-            if (retrofit == null) {
-                val gson = GsonBuilder()
-                        .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
-                        .excludeFieldsWithoutExposeAnnotation()
-                        .registerTypeAdapterFactory(elementTypeAdapterFactory)
-                        .create()
-
-                retrofit = Retrofit.Builder()
-                        .baseUrl(REDDIT_END_POINT)
-                        .addConverterFactory(GsonConverterFactory.create(gson))
-                        .build()
-            }
-            return retrofit!!
-        }
 }

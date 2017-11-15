@@ -8,6 +8,7 @@ import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.util.ActivityUtils
 
+
 /**
  * Created by chsc on 11.11.17.
  */

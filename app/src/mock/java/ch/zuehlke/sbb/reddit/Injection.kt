@@ -7,7 +7,11 @@ import ch.zuehlke.sbb.reddit.data.source.RedditRepository
 import ch.zuehlke.sbb.reddit.data.source.local.RedditNewsLocalDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.RedditElementTypeAdapterFactory.Companion.elementTypeAdapterFactory
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
+import com.github.salomonbrys.kodein.Kodein
+import com.github.salomonbrys.kodein.bind
+import com.github.salomonbrys.kodein.singleton
 import com.google.common.base.Preconditions.checkNotNull
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 
@@ -16,6 +20,15 @@ import com.google.gson.reflect.TypeToken
  */
 
 object Injection {
+
+    val kodein = Kodein{
+
+        bind<Gson>() with singleton {
+            GsonBuilder()
+                    .registerTypeAdapterFactory(elementTypeAdapterFactory)
+                    .create()
+        }
+    }
 
     val gson = GsonBuilder()
             .registerTypeAdapterFactory(elementTypeAdapterFactory)

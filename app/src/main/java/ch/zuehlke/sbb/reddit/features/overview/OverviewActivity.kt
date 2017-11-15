@@ -1,10 +1,8 @@
 package ch.zuehlke.sbb.reddit.features.overview
 
 import android.os.Bundle
-import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-
 import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.util.ActivityUtils

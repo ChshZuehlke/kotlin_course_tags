@@ -25,7 +25,7 @@ private constructor(newsRemoteDataSource: RedditDataSource,
     private val mRedditNewsLocalDataSource: RedditDataSource
 
     /**
-     * This variable has package local visibility so it can be accessed from tests.
+     * This variable has package local visibility so it can be accessed from tests.H
      */
     internal var mCacheNews: MutableMap<String, RedditNewsData>? = null
 
