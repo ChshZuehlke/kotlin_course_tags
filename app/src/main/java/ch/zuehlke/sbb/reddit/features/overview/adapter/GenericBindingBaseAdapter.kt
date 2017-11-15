@@ -1,11 +1,16 @@
 package ch.zuehlke.sbb.reddit.features.overview.adapter
 
+import android.databinding.DataBindingUtil
+import android.databinding.ViewDataBinding
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
+
 /**
  * Created by chsc on 15.11.17.
  */
 
 
-abstract class GenericBindingBaseAdapter : android.support.v7.widget.RecyclerView.Adapter<GenericBindingViewHolder>() {
+abstract class GenericBindingBaseAdapter : RecyclerView.Adapter<GenericBindingViewHolder>() {
 
 
     override fun onBindViewHolder(holder: GenericBindingViewHolder, position: Int) {
@@ -14,14 +19,14 @@ abstract class GenericBindingBaseAdapter : android.support.v7.widget.RecyclerVie
     }
 
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): GenericBindingViewHolder {
-        val inflater = android.view.LayoutInflater.from(parent.context)
-        val binding = android.databinding.DataBindingUtil.inflate<android.databinding.ViewDataBinding>(inflater, getLayoutIdForViewType(viewType), parent, false)
+        val inflater = LayoutInflater.from(parent.context)
+        val binding: ViewDataBinding = DataBindingUtil.inflate(inflater, viewType, parent, false)
         return GenericBindingViewHolder(binding)
     }
 
 
     override fun getItemViewType(position: Int): Int {
-        return getViewTypeForPosition(position)
+        return getLayoutIdForViewType(position)
     }
 
     protected abstract fun getObjForPosition(position: Int): Any

@@ -2,6 +2,7 @@ package ch.zuehlke.sbb.reddit.features.overview.adapter.impl
 
 
 import android.databinding.BindingAdapter
+import android.graphics.drawable.Drawable
 import android.support.annotation.IntegerRes
 import android.widget.ImageView
 import android.widget.TextView
@@ -18,24 +19,23 @@ import com.squareup.picasso.Picasso
 object RedditNewsBindingAdapter{
 
     @JvmStatic
-    @BindingAdapter(value = *arrayOf("imageUrl" , "placeHolder"), requireAll = false)
-    fun setImageUrl(imageView: ImageView, url: String,placeHolder: Int?){
+    @BindingAdapter("imageUrl","placeHolder",requireAll = false )
+    fun setImageUrl(imageView: ImageView, url: String?,placeHolder: Drawable?){
         if(Strings.isNullOrEmpty(url) && placeHolder != null){
-            Picasso.with(imageView.context).load(placeHolder).into(imageView)
+            imageView.setImageDrawable(placeHolder)
         }else if(!Strings.isNullOrEmpty(url)){
             Picasso.with(imageView.context).load(url).into(imageView)
         }else{
             Picasso.with(imageView.context).load(R.drawable.reddit_placeholder).into(imageView)
         }
-        Int
     }
+
 
     @JvmStatic
     @BindingAdapter("friendlyTime")
     fun setFriendlyTime(textView: TextView, date: Long){
         textView.text = DateUtils.friendlyTime(date)
     }
-
 
 
 }

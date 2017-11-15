@@ -34,6 +34,7 @@ class ViewTypeAwareAdapter: GenericBindingBaseAdapter(){
     }
 
     fun clearAndAddNews(newsData: List<RedditNewsData>) {
+
         val previousItemSize = items.size
         items.clear()
         notifyItemRangeRemoved(0, previousItemSize)

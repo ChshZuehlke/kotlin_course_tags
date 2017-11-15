@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
 
     <data>
         <variable
             name="obj"
-            type="ch.zuehlke.sbb.reddit.models.RedditNewsData" />
+            type="ch.zuehlke.sbb.reddit.features.overview.adapter.ViewType" />
     </data>
 
     <LinearLayout

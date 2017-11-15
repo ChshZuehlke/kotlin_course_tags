@@ -43,7 +43,7 @@ object Injection {
 
     fun provideRedditNewsRepository(context: Context): RedditRepository {
         checkNotNull(context)
-        return RedditRepository.getInstance(RedditNewsDataRemoteDataSource.getInstance(context, getRedditAPI(retroFit)),
+        return RedditRepository.getInstance(RedditNewsDataRemoteDataSource.getInstance(context, getRedditAPI(retroFit), gson, type),
                 RedditNewsLocalDataSource.getInstance(context), context)
     }
 

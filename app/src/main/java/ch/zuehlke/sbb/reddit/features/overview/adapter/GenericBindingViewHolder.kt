@@ -4,6 +4,7 @@ import android.databinding.ViewDataBinding
 import android.support.v7.widget.RecyclerView
 import ch.zuehlke.sbb.reddit.BR
 
+
 /**
  * Created by chsc on 15.11.17.
  */
