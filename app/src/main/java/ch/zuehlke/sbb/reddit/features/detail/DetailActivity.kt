@@ -1,11 +1,9 @@
 package ch.zuehlke.sbb.reddit.features.detail
 
 import android.os.Bundle
-import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
-
 import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.util.ActivityUtils
@@ -35,11 +33,11 @@ class DetailActivity : AppCompatActivity() {
             // Create the fragment
             detailFragment = DetailFragment.newInstance()
             ActivityUtils.addFragmentToActivity(
-                    supportFragmentManager, detailFragment!!, R.id.contentFrame)
+                    supportFragmentManager, detailFragment, R.id.contentFrame)
         }
 
         // Create the presenter
-        mOverviewPresenter = DetailPresenter(detailFragment, Injection.provideRedditNewsRepository(this), redditUrl, Injection.getRedditAPI(Injection.retroFit))
+        mOverviewPresenter = DetailPresenter(detailFragment, Injection.provideRedditNewsRepository(this), redditUrl)
     }
 
     companion object {

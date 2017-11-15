@@ -14,18 +14,16 @@ import com.google.gson.reflect.TypeToken
  * Created by chsc on 13.11.17.
  */
 
-class DetailPresenter(detailView: DetailContract.View, repository: RedditRepository, redditUrl: String, redditAPI: RedditAPI) : DetailContract.Presenter {
+class DetailPresenter(detailView: DetailContract.View, repository: RedditRepository, redditUrl: String) : DetailContract.Presenter {
 
     private val mRedditUrl: String
     private val mDetailView: DetailContract.View
     private val mRepository: RedditRepository
-    private val mRedditAPI: RedditAPI
 
     init {
         mRepository = checkNotNull(repository, "The repository cannot be null")
         mDetailView = checkNotNull(detailView, "The DetailView cannot be null")
         checkNotNull(redditUrl, "The reddit url cannot be null")
-        mRedditAPI = checkNotNull(redditAPI, "RedditAPI cannot be null")
         mRedditUrl = checkNotNull(redditUrl, "The reddit url cannot be null")
         detailView.setPresenter(this)
     }
@@ -35,12 +33,8 @@ class DetailPresenter(detailView: DetailContract.View, repository: RedditReposit
     }
 
 
+
     override fun loadRedditPosts() {
-        loadRedditPosts(mRedditUrl)
-    }
-
-
-    fun loadRedditPosts(url: String) {
         if (mDetailView.isActive) {
             mDetailView.setLoadingIndicator(true)
         }
@@ -62,20 +56,6 @@ class DetailPresenter(detailView: DetailContract.View, repository: RedditReposit
             }
         }, mRedditUrl)
 
-    }
-
-    companion object {
-
-        private val type = object : TypeToken<List<RedditPostElement>>() {
-
-        }.type
-
-        private val gson = GsonBuilder()
-                .registerTypeAdapterFactory(elementTypeAdapterFactory)
-                .create()
-
-
-        private val TAG = "DetailPresenter"
     }
 
 }
