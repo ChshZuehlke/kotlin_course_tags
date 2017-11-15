@@ -14,9 +14,7 @@ import android.view.ViewGroup
 
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.detail.DetailActivity
-import ch.zuehlke.sbb.reddit.features.overview.adapter.impl.RedditNewsDelegateAdapter
-import ch.zuehlke.sbb.reddit.features.overview.adapter.impl.RedditNewsDelegateAdapter.OnNewsSelectedListener
-import ch.zuehlke.sbb.reddit.features.overview.adapter.impl.RedditOverviewAdapter
+import ch.zuehlke.sbb.reddit.features.overview.adapter.impl.ViewTypeAwareAdapter
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 
 import com.google.common.base.Preconditions.checkNotNull
@@ -28,16 +26,16 @@ import com.google.common.base.Preconditions.checkNotNull
 class OverviewFragment : Fragment(), OverviewContract.View {
 
     private var mOverviewPresenter: OverviewContract.Presenter? = null
-    private var mOverviewAdapter: RedditOverviewAdapter? = null
+    private var mOverviewAdapter: ViewTypeAwareAdapter? = null
     private var mNoNewsView: View? = null
     private var mNewsView: RecyclerView? = null
 
-
+    /*
     private val listener = object: OnNewsSelectedListener {
         override fun onNewsSelected(url: String) {
             showRedditNewsDetails(url)
         }
-    }
+    }*/
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater!!.inflate(R.layout.fragment_overview, container, false)
@@ -76,7 +74,8 @@ class OverviewFragment : Fragment(), OverviewContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mOverviewAdapter = RedditOverviewAdapter(listener)
+      //  mOverviewAdapter = RedditOverviewAdapter(listener)
+        mOverviewAdapter = ViewTypeAwareAdapter()
     }
 
     override fun onResume() {

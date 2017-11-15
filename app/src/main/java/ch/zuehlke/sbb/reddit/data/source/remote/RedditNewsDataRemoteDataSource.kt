@@ -24,13 +24,16 @@ import retrofit2.Callback
 import retrofit2.Response
 
 import com.google.common.base.Preconditions.checkNotNull
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 
 /**
  * Created by chsc on 08.11.17.
  */
 
 class RedditNewsDataRemoteDataSource// Prevent direct instantiation.
-private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
+private constructor(context: Context, redditAPI: RedditAPI,private val type: Type,private val gson: Gson) : RedditDataSource {
     private var after = ""
     private var order = -1
     private val mRedditAPI: RedditAPI
@@ -171,7 +174,7 @@ private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
     private fun parseResponseToPostElements(response: ResponseBody): List<RedditPostElement> {
         var redditPostElements: List<RedditPostElement>? = null
         try {
-            redditPostElements = Injection.gson.fromJson<List<RedditPostElement>>(response.string(), Injection.type)
+            redditPostElements = gson.fromJson<List<RedditPostElement>>(response.string(), type)
         } catch (e: IOException) {
            Log.e(TAG,"Error while parsing respone $e")
         }
@@ -198,9 +201,9 @@ private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
 
         private var INSTANCE: RedditNewsDataRemoteDataSource? = null
 
-        fun getInstance(context: Context, redditAPI: RedditAPI): RedditNewsDataRemoteDataSource {
+        fun getInstance(context: Context, redditAPI: RedditAPI,gson: Gson,type: Type): RedditNewsDataRemoteDataSource {
             if (INSTANCE == null) {
-                INSTANCE = RedditNewsDataRemoteDataSource(context, redditAPI)
+                INSTANCE = RedditNewsDataRemoteDataSource(context, redditAPI,type,gson)
             }
             return INSTANCE!!
         }
