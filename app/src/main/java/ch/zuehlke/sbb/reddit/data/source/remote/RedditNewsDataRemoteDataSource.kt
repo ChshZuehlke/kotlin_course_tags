@@ -23,6 +23,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.reflect.Type
 
 import com.google.common.base.Preconditions.checkNotNull
 import com.google.gson.Gson
@@ -32,14 +33,18 @@ import com.google.gson.Gson
  */
 
 class RedditNewsDataRemoteDataSource// Prevent direct instantiation.
-private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
+private constructor(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
     private var after = ""
     private var order = -1
     private val mRedditAPI: RedditAPI
+    private val mGson: Gson
+    private val mType: Type
 
     init {
         checkNotNull(context)
         mRedditAPI = checkNotNull(redditAPI, "The reddit api cannot be null")
+        mGson = gson
+        mType = type
 
     }
 
@@ -173,7 +178,7 @@ private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
     private fun parseResponseToPostElements(response: ResponseBody): List<RedditPostElement> {
         var redditPostElements: List<RedditPostElement>? = null
         try {
-            redditPostElements = Injection.kodein.instance<Gson>().fromJson<List<RedditPostElement>>(response.string(), Injection.type)
+            redditPostElements = mGson.fromJson<List<RedditPostElement>>(response.string(), mType)
         } catch (e: IOException) {
            Log.e(TAG,"Error while parsing respone $e")
         }
@@ -200,9 +205,9 @@ private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
 
         private var INSTANCE: RedditNewsDataRemoteDataSource? = null
 
-        fun getInstance(context: Context, redditAPI: RedditAPI): RedditNewsDataRemoteDataSource {
+        fun getInstance(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type): RedditNewsDataRemoteDataSource {
             if (INSTANCE == null) {
-                INSTANCE = RedditNewsDataRemoteDataSource(context, redditAPI)
+                INSTANCE = RedditNewsDataRemoteDataSource(context, redditAPI, gson, type)
             }
             return INSTANCE!!
         }
