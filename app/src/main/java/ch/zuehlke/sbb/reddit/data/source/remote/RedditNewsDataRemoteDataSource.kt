@@ -9,16 +9,11 @@ import java.io.IOException
 import java.util.ArrayList
 import java.util.Date
 
-import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIChildrenResponse
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIChildrenResponseData
 import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIResponse
-import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
-import com.github.salomonbrys.kodein.instance
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
