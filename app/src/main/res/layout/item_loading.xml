@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="56dp"
-    android:layout_margin="20dp"
-    android:gravity="center_horizontal"
-    android:orientation="horizontal">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ProgressBar
-        android:layout_marginTop="10dp"
-        android:id="@+id/progress"
-        android:layout_width="40dp"
-        android:layout_height="40dp" />
-</LinearLayout>
+
+    <data>
+        <variable
+            name="obj"
+            type="ch.zuehlke.sbb.reddit.features.overview.adapter.ViewType" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_margin="20dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
+</layout>
