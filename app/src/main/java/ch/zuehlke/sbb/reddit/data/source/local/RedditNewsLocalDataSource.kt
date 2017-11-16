@@ -11,8 +11,7 @@ import io.reactivex.Observable
  * Created by chsc on 08.11.17.
  */
 
-class RedditNewsLocalDataSource// Prevent direct instantiation.
-private constructor(context: Context) : RedditDataSource {
+class RedditNewsLocalDataSource constructor(context: Context) : RedditDataSource {
     override val news: Flowable<List<RedditNewsData>>
         get() = Flowable.empty()  // FIXME
 

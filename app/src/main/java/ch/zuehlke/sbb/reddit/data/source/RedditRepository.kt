@@ -1,5 +1,6 @@
 package ch.zuehlke.sbb.reddit.data.source
 
+import android.content.Context
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import io.reactivex.Flowable
@@ -9,8 +10,7 @@ import io.reactivex.Observable
  * Created by chsc on 08.11.17.
  */
 
-class RedditRepository// Prevent direct instantiation.
-private constructor(val newsRemoteDataSource: RedditDataSource, val newsLocalDataSource: RedditDataSource) : RedditDataSource {
+class RedditRepository (val newsRemoteDataSource: RedditDataSource, val newsLocalDataSource: RedditDataSource, context: Context) : RedditDataSource {
 
     val sources = listOf(newsLocalDataSource, newsRemoteDataSource)
 
@@ -49,21 +49,29 @@ private constructor(val newsRemoteDataSource: RedditDataSource, val newsLocalDat
     }
 
     override fun saveRedditNews(data: RedditNewsData) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        checkNotNull(data)
+
+        newsLocalDataSource.saveRedditNews(data)
+        newsRemoteDataSource.saveRedditNews(data) // Although we call saveRedditNews() on the remote datasource, it is not implemented.
     }
+
+    private fun updateLocalDataSource(news: List<RedditNewsData>) {
+        for (data in news) {
+            newsLocalDataSource.saveRedditNews(data)
+        }
+    }
+
+    private fun refreshLocalDataSource(news: List<RedditNewsData>) {
+        newsLocalDataSource.deleteAllNews()
+        for (data in news) {
+            newsLocalDataSource.saveRedditNews(data)
+        }
+    }
+
     companion object {
 
         private val TAG = "RemoteDataSource"
 
         private val COMMENT_SECION = "comments/"
-
-        private var INSTANCE: RedditRepository? = null
-
-        fun getInstance(newsRemoteDataSource: RedditDataSource, newsLocalDataSource: RedditDataSource): RedditRepository {
-            if (INSTANCE == null) {
-                INSTANCE = RedditRepository(newsRemoteDataSource, newsLocalDataSource)
-            }
-            return INSTANCE!!
-        }
     }
 }

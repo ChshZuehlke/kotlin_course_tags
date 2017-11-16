@@ -104,7 +104,7 @@ class OverviewPresenter(private val view: OverviewContract.View, private val red
                     .subscribeWith(reddidSubscriber!!)
             )
         }
-        reddidSubscriber!!.nextPage()
+        reddidSubscriber?.nextPage()
     }
 
     private fun processTasks(news: List<RedditNewsData>, added: Boolean) {

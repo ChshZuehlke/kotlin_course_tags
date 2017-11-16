@@ -22,8 +22,7 @@ import java.lang.reflect.Type
  * Created by chsc on 08.11.17.
  */
 
-class RedditNewsDataRemoteDataSource// Prevent direct instantiation.
-private constructor(val context: Context, val redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
+class RedditNewsDataRemoteDataSource constructor(val context: Context, val redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
     private var order = -1
     private val mGson: Gson
     private val mType: Type

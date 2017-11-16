@@ -72,6 +72,9 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
+    implementation "com.github.salomonbrys.kodein:kodein:$kodein_version"
+    implementation "com.github.salomonbrys.kodein:kodein-android:$kodein_version"
+
 
 
     // Test dependencies

@@ -15,6 +15,9 @@ import ch.zuehlke.sbb.reddit.models.RedditPostsData
 
 class FakeRedditNewsRemoteDataSource// Prevent direct instantiation.
  constructor() : RedditDataSource {
+
+    private val REDDIT_NEWS_SERVICE_DATA = LinkedHashMap<String, RedditNewsData>()
+
     override fun getMoreNews(callback: RedditDataSource.LoadNewsCallback) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -50,17 +53,4 @@ class FakeRedditNewsRemoteDataSource// Prevent direct instantiation.
         // In this demo app we do not support posting of news, therefore not implemented.
     }
 
-    companion object {
-
-        private var INSTANCE: FakeRedditNewsRemoteDataSource? = null
-
-        private val REDDIT_NEWS_SERVICE_DATA = LinkedHashMap<String, RedditNewsData>()
-
-        fun getInstance(): FakeRedditNewsRemoteDataSource{
-            if (INSTANCE == null) {
-                INSTANCE = FakeRedditNewsRemoteDataSource()
-            }
-            return INSTANCE!!
-        }
-    }
 }
