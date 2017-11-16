@@ -14,22 +14,14 @@ import ch.zuehlke.sbb.reddit.models.RedditNewsData
 interface RedditNewsDataDao{
 
 
-    @Query("select * from RedditNewsData ")
+    @Query("select * from RedditNewsData")
     fun getNews(): List<RedditNewsData>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addNewsItem(item: List<RedditNewsData>)
 
-    /*fun getPosts(callback: RedditDataSource.LoadPostsCallback, title: String)
+    @Query("delete from RedditNewsData")
+    fun deleteNews()
 
-    fun savePosts(data: RedditPostsData)
-
-    fun deletePostsWithPermaLink(permaLink: String)
-
-    fun refreshNews()
-
-    fun deleteAllNews()
-
-    fun saveRedditNews(data: RedditNewsData)*/
 
 }
