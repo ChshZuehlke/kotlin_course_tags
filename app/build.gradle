@@ -68,6 +68,10 @@ dependencies {
     implementation "com.github.salomonbrys.kodein:kodein:$kodein_version"
     implementation "com.github.salomonbrys.kodein:kodein-android:$kodein_version"
 
+    //Room
+    implementation "android.arch.persistence.room:runtime:1.0.0-beta1"
+    kapt "android.arch.persistence.room:compiler:1.0.0-beta1"
+
 
 
     // Test dependencies
