@@ -2,6 +2,7 @@ package ch.zuehlke.sbb.reddit.data.source
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkInfo
 
 import java.util.ArrayList
 import java.util.LinkedHashMap
@@ -138,9 +139,8 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
         mRedditNewsRemoteDataSource.getPosts(object : RedditDataSource.LoadPostsCallback {
             override fun onPostsLoaded(posts: List<RedditPostsData>) {
                 mRedditNewsLocalDataSource.deletePostsWithPermaLink(convertedPermaLink)
-                for (data in posts) {
-                    mRedditNewsLocalDataSource.savePosts(data)
-                }
+                mRedditNewsLocalDataSource.savePosts(posts)
+
                 callback.onPostsLoaded(posts)
             }
 
@@ -156,7 +156,7 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
         return parsedUrl.substring(0, parsedUrl.length - 1)
     }
 
-    override fun savePosts(data: RedditPostsData) {
+    override fun savePosts(data: List<RedditPostsData>) {
 
     }
 
