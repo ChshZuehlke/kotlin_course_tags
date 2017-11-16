@@ -2,99 +2,81 @@ package ch.zuehlke.sbb.reddit.data.source.remote
 
 import android.content.Context
 import android.util.Log
-
-import com.google.common.base.Strings
-
-import java.io.IOException
-import java.util.ArrayList
-import java.util.Date
-
 import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIChildrenResponse
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIChildrenResponseData
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIResponse
-import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
+import com.google.common.base.Strings
+import io.reactivex.Emitter
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-
-import com.google.common.base.Preconditions.checkNotNull
-
-/**
- * Created by chsc on 08.11.17.
- */
+import java.io.IOException
+import java.util.*
 
 class RedditNewsDataRemoteDataSource// Prevent direct instantiation.
-private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
-    private var after = ""
+private constructor(val context: Context, val redditAPI: RedditAPI) : RedditDataSource {
     private var order = -1
-    private val mRedditAPI: RedditAPI
 
     init {
         checkNotNull(context)
-        mRedditAPI = checkNotNull(redditAPI, "The reddit api cannot be null")
-
+        checkNotNull(redditAPI, { "The reddit API cannot be null" })
     }
 
+    override val news: Flowable<List<RedditNewsData>>
+        get() {
+            Log.d(TAG, "Creating a reddit news data flowable")
+            return Flowable.generate(
+                    {
+                        Log.d(TAG, "Subscription started")
+                        ""
+                    },
+                    fun(next: String, emitter: Emitter<List<RedditNewsData>>): String {
+                        Log.d(TAG, "Next page id available: $next")
+                        val requestNews = requestNews(next)
 
-    override fun getMoreNews(callback: RedditDataSource.LoadNewsCallback) {
-        val call = mRedditAPI.getSortedNews("hot", after, "10")
-        call.enqueue(object : Callback<RedditNewsAPIResponse> {
-            override fun onResponse(call: Call<RedditNewsAPIResponse>, response: Response<RedditNewsAPIResponse>) {
-                after = response.body().data!!.after!!
-                Log.i(TAG, "Recieved reddit response: " + response.body())
-                val redditNewsDataList = ArrayList<RedditNewsData>()
-                for (child in response.body().data!!.children!!) {
-                    val data = child.data
-                    Log.i(TAG, "child date: " + Date(data!!.created))
-                    data?.let {
-                        redditNewsDataList.add(RedditNewsData(data.author!!, data.title!!, data.num_comments, data.created, data.thumbnail!!, data.url!!, data.id!!, data.permalink!!))
+                        Log.d(TAG, "Waiting for the response")
+                        val (news, nextTag) = requestNews.blockingGet()
+                        emitter.onNext(news.mapNotNull { it })
+                        return nextTag?:""
+                    })
+        }
 
+    private fun requestNews(after: String): Single<Pair<List<RedditNewsData?>, String?>> {
+        val newsSource = redditAPI.getSortedNews("hot", after, "10")
+        val subscribeOnIo = newsSource.subscribeOn(Schedulers.io())
+        return subscribeOnIo.map { response ->
+            val news = response.data?.children?.map { child ->
+                child.data?.let { d ->
+                    d.author?.let { author ->
+                        d.title?.let { title ->
+                            d.thumbnail?.let { thumbnail ->
+                                d.url?.let { url ->
+                                    d.id?.let { id ->
+                                        d.permalink?.let { permalink ->
+                                            RedditNewsData(author, title, d.num_comments, d.created, thumbnail, url, id, permalink)
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
                     }
-                     }
-                callback.onNewsLoaded(redditNewsDataList)
-            }
-
-            override fun onFailure(call: Call<RedditNewsAPIResponse>, t: Throwable) {
-                Log.e(TAG, "Error while requesting reddit news: ", t)
-                callback.onDataNotAvailable()
-            }
-        })
-    }
-
-    override fun getNews(callback: RedditDataSource.LoadNewsCallback) {
-
-
-        val call = mRedditAPI.getSortedNews("hot", "", "10")
-        call.enqueue(object : Callback<RedditNewsAPIResponse> {
-            override fun onResponse(call: Call<RedditNewsAPIResponse>, response: Response<RedditNewsAPIResponse>) {
-                after = response.body().data!!.after!!
-                Log.i(TAG, "Recieved reddit response: " + response.body())
-                val redditNewsDataList = ArrayList<RedditNewsData>()
-                for (child in response.body().data!!.children!!) {
-                    val data = child.data
-                    data?.let {
-                        redditNewsDataList.add(RedditNewsData(data.author!!, data.title!!, data.num_comments, data.created, data.thumbnail!!, data.url!!, data.id!!, data.permalink!!))
-                    }
-
                 }
-                callback.onNewsLoaded(redditNewsDataList)
-            }
+            } ?: emptyList()
+            Pair(news, response.data?.after)
+        }
+    }
 
-            override fun onFailure(call: Call<RedditNewsAPIResponse>, t: Throwable) {
-                Log.e(TAG, "Error while requesting reddit news: ", t)
-                callback.onDataNotAvailable()
-            }
-        })
+    override fun posts(title: String): Observable<List<RedditPostsData>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun getPosts(callback: RedditDataSource.LoadPostsCallback, title: String) {
-        val call = mRedditAPI.getRedditPosts(title, "new")
+        /*val call = mRedditAPI.getRedditPosts(title, "new")
         call.enqueue(object : Callback<ResponseBody> {
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
@@ -110,7 +92,7 @@ private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
                 callback.onDataNotAvailable()
             }
         })
-
+*/
     }
 
     override fun savePosts(data: RedditPostsData) {
@@ -173,7 +155,7 @@ private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
         try {
             redditPostElements = Injection.gson.fromJson<List<RedditPostElement>>(response.string(), Injection.type)
         } catch (e: IOException) {
-           Log.e(TAG,"Error while parsing respone $e")
+            Log.e(TAG, "Error while parsing respone $e")
         }
 
         return redditPostElements!!
@@ -181,7 +163,7 @@ private constructor(context: Context, redditAPI: RedditAPI) : RedditDataSource {
     }
 
     override fun refreshNews() {
-        after = ""
+        //after = ""
     }
 
     override fun deleteAllNews() {

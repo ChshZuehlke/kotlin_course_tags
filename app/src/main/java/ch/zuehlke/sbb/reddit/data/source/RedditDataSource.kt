@@ -2,6 +2,8 @@ package ch.zuehlke.sbb.reddit.data.source
 
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
+import io.reactivex.Flowable
+import io.reactivex.Observable
 
 /**
  * Created by chsc on 08.11.17.
@@ -9,12 +11,9 @@ import ch.zuehlke.sbb.reddit.models.RedditPostsData
 
 interface RedditDataSource {
 
-    interface LoadNewsCallback {
+    val news: Flowable<List<RedditNewsData>>
 
-        fun onNewsLoaded(data: List<RedditNewsData>)
-
-        fun onDataNotAvailable()
-    }
+    fun posts(title: String): Observable<List<RedditPostsData>>
 
     interface LoadPostsCallback {
 
@@ -23,10 +22,6 @@ interface RedditDataSource {
         fun onDataNotAvailable()
     }
 
-
-    fun getMoreNews(callback: LoadNewsCallback)
-
-    fun getNews(callback: LoadNewsCallback)
 
     fun getPosts(callback: LoadPostsCallback, title: String)
 

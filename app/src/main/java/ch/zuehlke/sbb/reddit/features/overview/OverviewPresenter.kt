@@ -1,26 +1,62 @@
 package ch.zuehlke.sbb.reddit.features.overview
 
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 
 import com.google.common.base.Preconditions.checkNotNull
+import io.reactivex.annotations.SchedulerSupport
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subscribers.ResourceSubscriber
 
 /**
  * Created by chsc on 11.11.17.
  */
 
-class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRepository) : OverviewContract.Presenter {
+class OverviewPresenter(private val view: OverviewContract.View, private val redditRepository: RedditRepository) : OverviewContract.Presenter {
 
-    private val mOverviewView: OverviewContract.View
     private var mFirstLoad = true
-    private val mRedditRepository: RedditRepository
+
+    abstract class PageSubscriber : ResourceSubscriber<List<RedditNewsData>>() {
+        override fun onStart() {
+            nextPage()
+        }
+
+        fun nextPage() {
+            Log.d(TAG, "Request next page")
+            request(1)
+        }
+    }
+
+    val reddidSubscriber = object : PageSubscriber() {
+        override fun onNext(page: List<RedditNewsData>?) {
+            Log.d(TAG, "Got page with ${page?.size} entries")
+            page?.let { processTasks(it, true) }
+        }
+
+        override fun onComplete() {
+            Log.d(TAG, "Reddit subscription completed")
+        }
+
+        override fun onError(t: Throwable?) {
+            Log.e(TAG, "Reddit subscription failed with $t")
+        }
+    }
+
+    val redditDisposable: Disposable
+
 
     init {
-        mOverviewView = checkNotNull(view, "OverviewView cannot be null")
-        mRedditRepository = checkNotNull(redditRepository, "RedditRepository cannot be null")
+        checkNotNull(view, "OverviewView cannot be null")
+        checkNotNull(redditRepository, "RedditRepository cannot be null")
         view.setPresenter(this)
+        redditDisposable = redditRepository.news
+                    .observeOn(Schedulers.io(), false, 1)
+                    .subscribeWith(reddidSubscriber)
     }
 
     override fun start() {
@@ -37,60 +73,16 @@ class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRep
 
     override fun showRedditNews(redditNewsData: RedditNewsData) {
         checkNotNull(redditNewsData, "redditNewsData cannot be null!")
-        mOverviewView.showRedditNewsDetails(redditNewsData.id!!)
+        view.showRedditNewsDetails(redditNewsData.id!!)
     }
 
 
     override fun loadMoreRedditNews() {
-        mRedditRepository.getMoreNews(object : RedditDataSource.LoadNewsCallback {
-            override fun onNewsLoaded(data: List<RedditNewsData>) {
-                // The view may not be able to handle UI updates anymore
-                if (!mOverviewView.isActive) {
-                    return
-                }
-                processTasks(data, true)
-            }
-
-            override fun onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mOverviewView.isActive) {
-                    return
-                }
-                mOverviewView.showRedditNewsLoadingError()
-            }
-        })
-
+        reddidSubscriber.nextPage()
     }
 
     private fun loadRedditNews(forceUpdate: Boolean, showLoadingUI: Boolean) {
-        if (showLoadingUI) {
-            mOverviewView.setLoadingIndicator(true)
-        }
-        if (forceUpdate) {
-            mRedditRepository.refreshNews()
-        }
-
-        mRedditRepository.getNews(object : RedditDataSource.LoadNewsCallback {
-            override fun onNewsLoaded(newsDataList: List<RedditNewsData>) {
-                // The view may not be able to handle UI updates anymore
-                if (!mOverviewView.isActive) {
-                    return
-                }
-                if (showLoadingUI) {
-                    mOverviewView.setLoadingIndicator(false)
-                }
-
-                processTasks(newsDataList, false)
-            }
-
-            override fun onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mOverviewView.isActive) {
-                    return
-                }
-                mOverviewView.showRedditNewsLoadingError()
-            }
-        })
+        reddidSubscriber.nextPage()
     }
 
     private fun processTasks(news: List<RedditNewsData>, added: Boolean) {
@@ -100,16 +92,15 @@ class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRep
         } else {
             // Show the list of news
             if (added) {
-                mOverviewView.addRedditNews(news)
+                view.addRedditNews(news)
             } else {
-                mOverviewView.showRedditNews(news)
+                view.showRedditNews(news)
             }
 
         }
     }
 
-
     private fun processEmptyTasks() {
-        mOverviewView.showNoNews()
+        view.showNoNews()
     }
 }

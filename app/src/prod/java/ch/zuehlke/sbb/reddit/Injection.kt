@@ -2,25 +2,19 @@ package ch.zuehlke.sbb.reddit
 
 
 import android.content.Context
-
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
-
-import java.lang.reflect.Modifier
-import java.lang.reflect.Type
-
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
 import ch.zuehlke.sbb.reddit.data.source.local.RedditNewsLocalDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.RedditAPI
 import ch.zuehlke.sbb.reddit.data.source.remote.RedditElementTypeAdapterFactory.Companion.elementTypeAdapterFactory
 import ch.zuehlke.sbb.reddit.data.source.remote.RedditNewsDataRemoteDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-
-
 import com.google.common.base.Preconditions.checkNotNull
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
+import java.lang.reflect.Modifier
 
 /**
  * Enables injection of production implementations for
@@ -43,8 +37,10 @@ object Injection {
 
     fun provideRedditNewsRepository(context: Context): RedditRepository {
         checkNotNull(context)
-        return RedditRepository.getInstance(RedditNewsDataRemoteDataSource.getInstance(context, getRedditAPI(retroFit)),
-                RedditNewsLocalDataSource.getInstance(context), context)
+        return RedditRepository.getInstance(
+                RedditNewsDataRemoteDataSource.getInstance(context, getRedditAPI(retroFit)),
+                RedditNewsLocalDataSource.getInstance(context)
+        )
     }
 
     fun getRedditAPI(retrofit: Retrofit): RedditAPI {
@@ -65,6 +61,7 @@ object Injection {
 
                 retrofit = Retrofit.Builder()
                         .baseUrl(REDDIT_END_POINT)
+                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                         .addConverterFactory(GsonConverterFactory.create(gson))
                         .build()
             }
