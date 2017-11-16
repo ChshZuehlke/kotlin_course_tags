@@ -1,21 +1,9 @@
 package ch.zuehlke.sbb.reddit.data.source
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
-import ch.zuehlke.sbb.reddit.data.source.remote.RedditAPI
-import ch.zuehlke.sbb.reddit.data.source.remote.RedditNewsDataRemoteDataSource
-
-import java.util.ArrayList
-import java.util.LinkedHashMap
-
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
-
-import com.google.common.base.Preconditions.checkNotNull
 import io.reactivex.Flowable
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
  * Created by chsc on 08.11.17.
@@ -24,12 +12,20 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 class RedditRepository// Prevent direct instantiation.
 private constructor(val newsRemoteDataSource: RedditDataSource, val newsLocalDataSource: RedditDataSource) : RedditDataSource {
 
-    override val news: Flowable<List<RedditNewsData>>
-        get() = Flowable
-                .merge(listOf(newsLocalDataSource.news, newsRemoteDataSource.news), 1, 1)
+    val sources = listOf(newsLocalDataSource, newsRemoteDataSource)
 
-    override fun posts(title: String): Observable<List<RedditPostsData>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+    override val news: Flowable<List<RedditNewsData>>
+        get() = Flowable.merge(sources.map{it.news}, 1, 1)
+
+    private fun convertURLToRemote(url: String): String {
+        val parsedUrl = url.substring(url.indexOf(COMMENT_SECION) + COMMENT_SECION.length)
+        return parsedUrl.substring(0, parsedUrl.length - 1)
+    }
+
+    override fun posts(permalink: String): Observable<List<RedditPostsData>> {
+        val convertedPermalink = convertURLToRemote(permalink)
+        return Observable.merge(sources.map{it.posts(convertedPermalink)}, 1, 1)
     }
 
     override fun getPosts(callback: RedditDataSource.LoadPostsCallback, title: String) {
@@ -58,6 +54,8 @@ private constructor(val newsRemoteDataSource: RedditDataSource, val newsLocalDat
     companion object {
 
         private val TAG = "RemoteDataSource"
+
+        private val COMMENT_SECION = "comments/"
 
         private var INSTANCE: RedditRepository? = null
 

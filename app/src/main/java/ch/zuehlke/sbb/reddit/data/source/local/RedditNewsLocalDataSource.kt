@@ -1,17 +1,9 @@
 package ch.zuehlke.sbb.reddit.data.source.local
 
-import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
-
-import java.util.ArrayList
-
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
-
-import com.google.common.base.Preconditions.checkNotNull
 import io.reactivex.Flowable
 import io.reactivex.Observable
 
@@ -25,7 +17,7 @@ private constructor(context: Context) : RedditDataSource {
         get() = Flowable.empty()  // FIXME
 
     override fun posts(title: String): Observable<List<RedditPostsData>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Observable.empty<List<RedditPostsData>>()
     }
 
     override fun getPosts(callback: RedditDataSource.LoadPostsCallback, title: String) {

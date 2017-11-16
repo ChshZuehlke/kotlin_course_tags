@@ -1,14 +1,12 @@
 package ch.zuehlke.sbb.reddit.features.detail
 
-import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
+import android.content.ContentValues.TAG
+import android.util.Log
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
-import ch.zuehlke.sbb.reddit.data.source.remote.RedditAPI
-import ch.zuehlke.sbb.reddit.data.source.remote.RedditElementTypeAdapterFactory.Companion.elementTypeAdapterFactory
-import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
-import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import com.google.common.base.Preconditions.checkNotNull
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by chsc on 13.11.17.
@@ -33,29 +31,30 @@ class DetailPresenter(detailView: DetailContract.View, repository: RedditReposit
     }
 
 
-
     override fun loadRedditPosts() {
         if (mDetailView.isActive) {
             mDetailView.setLoadingIndicator(true)
         }
 
-        mRepository.getPosts(object : RedditDataSource.LoadPostsCallback {
-            override fun onPostsLoaded(posts: List<RedditPostsData>) {
-                if (mDetailView.isActive) {
-                    mDetailView.setLoadingIndicator(false)
-                    mDetailView.showRedditPosts(posts)
-                }
-
-            }
-
-            override fun onDataNotAvailable() {
-                if (mDetailView.isActive) {
-                    mDetailView.showRedditNewsLoadingError()
-                }
-
-            }
-        }, mRedditUrl)
-
+        mRepository
+                .posts(mRedditUrl)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread(), false, 1)
+                .filter { _ -> mDetailView.isActive }
+                .subscribeBy(
+                        onError = { error ->
+                            Log.e(TAG, "Error when loading reddit posts $mRedditUrl: $error")
+                            with(mDetailView) {
+                                setLoadingIndicator(false)
+                                showRedditNewsLoadingError()
+                            }
+                        },
+                        onNext = { posts ->
+                            with(mDetailView) {
+                                setLoadingIndicator(false)
+                                showRedditPosts(posts)
+                            }
+                        })
     }
 
 }
