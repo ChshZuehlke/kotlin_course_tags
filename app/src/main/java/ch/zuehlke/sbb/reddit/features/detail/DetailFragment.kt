@@ -12,7 +12,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import ch.zuehlke.sbb.reddit.R
+import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
+import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
+import ch.zuehlke.sbb.reddit.features.overview.InfiniteScrollListener
 import ch.zuehlke.sbb.reddit.features.overview.ScrollChildSwipeRefreshLayout
+import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import com.google.common.base.Preconditions.checkNotNull
 
@@ -24,14 +28,19 @@ import com.google.common.base.Preconditions.checkNotNull
 class DetailFragment : Fragment(), DetailContract.View {
 
     private var mPresenter: DetailContract.Presenter? = null
-    private var mAdapter: DetailAdapter? = null
+    private var mAdapter: PostAdapter? = null
     private var mPostView: RecyclerView? = null
     private var mNoPostView: View? = null
 
+    private val clickListener =  object: GenericBindingViewHolder.GenericBindingClickListener{
+        override fun onItemSelected(obj: Any) {
+            // Do nothing
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mAdapter = DetailAdapter(context)
+        mAdapter = PostAdapter(clickListener)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -103,4 +112,4 @@ class DetailFragment : Fragment(), DetailContract.View {
             return DetailFragment()
         }
     }
-}// Requires empty public constructor
+}

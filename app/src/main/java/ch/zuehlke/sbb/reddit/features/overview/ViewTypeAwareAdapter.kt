@@ -1,10 +1,11 @@
-package ch.zuehlke.sbb.reddit.features.overview.adapter.impl
+package ch.zuehlke.sbb.reddit.features.overview
 
 import android.support.v4.util.SparseArrayCompat
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.features.overview.adapter.AdapterConstants
-import ch.zuehlke.sbb.reddit.features.overview.adapter.GenericBindingBaseAdapter
-import ch.zuehlke.sbb.reddit.features.overview.adapter.ViewType
+import ch.zuehlke.sbb.reddit.features.AdapterConstants
+import ch.zuehlke.sbb.reddit.features.GenericBindingBaseAdapter
+import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
+import ch.zuehlke.sbb.reddit.features.ViewType
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 
 /**
@@ -12,7 +13,7 @@ import ch.zuehlke.sbb.reddit.models.RedditNewsData
  */
 
 
-class ViewTypeAwareAdapter: GenericBindingBaseAdapter(){
+class ViewTypeAwareAdapter(clickListener: GenericBindingViewHolder.GenericBindingClickListener): GenericBindingBaseAdapter(clickListener){
 
 
     private val items = mutableListOf<ViewType>()
@@ -20,7 +21,7 @@ class ViewTypeAwareAdapter: GenericBindingBaseAdapter(){
 
     init {
         viewTypeLayoutDelegate.put(AdapterConstants.LOADING, R.layout.item_loading)
-        viewTypeLayoutDelegate.put(AdapterConstants.NEWS,R.layout.item_overview)
+        viewTypeLayoutDelegate.put(AdapterConstants.NEWS, R.layout.item_overview)
     }
 
     fun addRedditNews(newsData: List<RedditNewsData>) {

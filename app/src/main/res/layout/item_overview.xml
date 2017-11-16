@@ -7,6 +7,10 @@
         <variable
             name="obj"
             type="ch.zuehlke.sbb.reddit.models.RedditNewsData" />
+
+        <variable
+            name="listener"
+            type="ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder.GenericBindingClickListener"/>
     </data>
 
 
@@ -14,7 +18,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:clickable="true"
+        android:onClick="@{() -> listener.onItemSelected(obj)}"
+        >
 
         <!-- Left Thumbnail image -->
 

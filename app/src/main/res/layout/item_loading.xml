@@ -5,7 +5,7 @@
     <data>
         <variable
             name="obj"
-            type="ch.zuehlke.sbb.reddit.features.overview.adapter.ViewType" />
+            type="ch.zuehlke.sbb.reddit.features.ViewType" />
     </data>
 
     <LinearLayout

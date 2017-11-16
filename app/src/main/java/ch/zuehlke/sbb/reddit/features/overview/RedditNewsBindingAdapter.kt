@@ -1,12 +1,15 @@
-package ch.zuehlke.sbb.reddit.features.overview.adapter.impl
+package ch.zuehlke.sbb.reddit.features.overview
 
 
+import android.content.Intent
 import android.databinding.BindingAdapter
 import android.graphics.drawable.Drawable
-import android.support.annotation.IntegerRes
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import ch.zuehlke.sbb.reddit.R
+import ch.zuehlke.sbb.reddit.features.detail.DetailActivity
+import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.util.DateUtils
 import com.google.common.base.Strings
 import com.squareup.picasso.Picasso
@@ -20,10 +23,10 @@ object RedditNewsBindingAdapter{
 
     @JvmStatic
     @BindingAdapter("imageUrl","placeHolder",requireAll = false )
-    fun setImageUrl(imageView: ImageView, url: String?,placeHolder: Drawable?){
+    fun setImageUrl(imageView: ImageView, url: String?, placeHolder: Drawable?){
         if(Strings.isNullOrEmpty(url) && placeHolder != null){
             imageView.setImageDrawable(placeHolder)
-        }else if(!Strings.isNullOrEmpty(url)){
+        }else if(!com.google.common.base.Strings.isNullOrEmpty(url)){
             Picasso.with(imageView.context).load(url).into(imageView)
         }else{
             Picasso.with(imageView.context).load(R.drawable.reddit_placeholder).into(imageView)
@@ -37,5 +40,10 @@ object RedditNewsBindingAdapter{
         textView.text = DateUtils.friendlyTime(date)
     }
 
-
+    @JvmStatic
+    fun showRedditPost(view: View, redditNews: RedditNewsData){
+        val intent = Intent(view.context, DetailActivity::class.java)
+        intent.putExtra(DetailActivity.EXTRA_REDDIT_NEWS_URL, redditNews.permaLink)
+        view.context.startActivity(intent)
+    }
 }
