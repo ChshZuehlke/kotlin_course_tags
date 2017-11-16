@@ -2,32 +2,20 @@ package ch.zuehlke.sbb.reddit.data.source.remote
 
 import android.content.Context
 import android.util.Log
-
-import com.google.common.base.Strings
-
-import java.io.IOException
-import java.util.ArrayList
-import java.util.Date
-
-import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIChildrenResponse
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIChildrenResponseData
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIResponse
-import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
-import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.base.Strings
 import com.google.gson.Gson
+import io.reactivex.Emitter
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.IOException
 import java.lang.reflect.Type
-import java.util.*
 
 /**
  * Created by chsc on 08.11.17.
@@ -35,15 +23,12 @@ import java.util.*
 
 class RedditNewsDataRemoteDataSource// Prevent direct instantiation.
 private constructor(val context: Context, val redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
-    private var after = ""
     private var order = -1
-    private val mRedditAPI: RedditAPI
     private val mGson: Gson
     private val mType: Type
 
     init {
         checkNotNull(context)
-        mRedditAPI = checkNotNull(redditAPI, "The reddit api cannot be null")
         checkNotNull(redditAPI, { "The reddit API cannot be null" })
         mGson = gson
         mType = type
