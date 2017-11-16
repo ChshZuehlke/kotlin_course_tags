@@ -35,6 +35,7 @@ class OverviewPresenter(private val view: OverviewContract.View, private val red
         override fun onNext(result: Pair<Boolean, List<RedditNewsData>>) {
             val (isFirst, page) = result
             Log.d(TAG, "Got page with ${page.size} entries")
+            Log.d(TAG, "On thread ${Thread.currentThread().name}")
             processTasks(page, !isFirst)
         }
 

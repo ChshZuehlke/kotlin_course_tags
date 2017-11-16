@@ -39,16 +39,15 @@ class RedditNewsDataRemoteDataSource constructor(val context: Context, val reddi
             Log.d(TAG, "Creating a reddit news data flowable")
             return Flowable.generate(
                     {
-                        Log.d(TAG, "Subscription started")
+                        Log.d(TAG, "Subscription started on thread ${Thread.currentThread().name}")
                         ""
                     },
                     fun(next: String, emitter: Emitter<List<RedditNewsData>>): String {
-                        val nextTag = next
-                        Log.d(TAG, "Next page id available: '$nextTag'")
+                        Log.d(TAG, "Next page id available: '$next'")
 
-                        val requestNews = requestNews(nextTag).subscribeOn(Schedulers.io())
+                        val requestNews = requestNews(next).subscribeOn(Schedulers.io())
 
-                        Log.d(TAG, "Waiting for the response")
+                        Log.d(TAG, "Waiting for the response on thread ${Thread.currentThread().name}")
                         requestNews.subscribe { (news, _) ->
                             Log.d(TAG, "Received page")
                             emitter.onNext(news.mapNotNull { it })
@@ -144,13 +143,5 @@ class RedditNewsDataRemoteDataSource constructor(val context: Context, val reddi
 
         private val TAG = "RemoteDataSource"
 
-        private var INSTANCE: RedditNewsDataRemoteDataSource? = null
-
-        fun getInstance(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type): RedditNewsDataRemoteDataSource {
-            if (INSTANCE == null) {
-                INSTANCE = RedditNewsDataRemoteDataSource(context, redditAPI, gson, type)
-            }
-            return INSTANCE!!
-        }
     }
 }
