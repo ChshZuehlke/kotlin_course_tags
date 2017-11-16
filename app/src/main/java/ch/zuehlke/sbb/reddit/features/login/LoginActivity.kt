@@ -1,24 +1,32 @@
 package ch.zuehlke.sbb.reddit.features.login
 
 import android.os.Bundle
-import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
-
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.util.ActivityUtils
+import com.github.salomonbrys.kodein.Kodein
+import com.github.salomonbrys.kodein.KodeinInjector
+import com.github.salomonbrys.kodein.android.AppCompatActivityInjector
+import com.github.salomonbrys.kodein.bind
+import com.github.salomonbrys.kodein.instance
 
 /**
  * Created by chsc on 08.11.17.
  */
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), AppCompatActivityInjector{
 
-    private var mLoginPresenter: LoginPresenter? = null
+    override val injector: KodeinInjector = KodeinInjector()
 
+    override fun provideOverridingModule() = Kodein.Module {
+        bind<LoginActivity>() to instance(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        initializeInjector()
+
         setContentView(R.layout.activity_login)
 
 
@@ -29,8 +37,10 @@ class LoginActivity : AppCompatActivity() {
             ActivityUtils.addFragmentToActivity(
                     supportFragmentManager, loginFragment!!, R.id.contentFrame)
         }
+    }
 
-        // Create the presenter
-        mLoginPresenter = LoginPresenter(loginFragment)
+    override fun onDestroy() {
+        super.onDestroy()
+        destroyInjector()
     }
 }

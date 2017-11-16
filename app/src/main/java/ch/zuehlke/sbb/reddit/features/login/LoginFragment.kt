@@ -11,24 +11,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-
-import com.google.common.base.Strings
-
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.overview.OverviewActivity
-
+import com.github.salomonbrys.kodein.Kodein
+import com.github.salomonbrys.kodein.KodeinInjector
+import com.github.salomonbrys.kodein.android.SupportFragmentInjector
+import com.github.salomonbrys.kodein.instance
 import com.google.common.base.Preconditions.checkNotNull
+import com.google.common.base.Strings
 
 /**
  * Created by chsc on 08.11.17.
  */
 
-class LoginFragment : Fragment(), LoginContract.View {
+class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
 
-    private var mPresenter: LoginContract.Presenter? = null
+    override val injector: KodeinInjector = KodeinInjector()
+
+    override fun provideOverridingModule() = Kodein.Module {
+        import(createLoginModule(this@LoginFragment))
+    }
+
+    //injected
+    private val mPresenter: LoginContract.Presenter by instance()
+
     private var mProgessBar: ProgressBar? = null
     private var mLoginButton: AppCompatButton? = null
     private var mUsername: TextInputEditText? = null
@@ -39,7 +45,16 @@ class LoginFragment : Fragment(), LoginContract.View {
         mPresenter!!.start()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+        initializeInjector()
+
         val root = inflater!!.inflate(R.layout.fragment_login, container, false)
         mProgessBar = root.findViewById<ProgressBar>(R.id.progressBar)
         mLoginButton = root.findViewById<AppCompatButton>(R.id.loginButton)
@@ -85,14 +100,13 @@ class LoginFragment : Fragment(), LoginContract.View {
             }
         })
 
-
-
         return root
 
     }
 
+    //TODO use with kodein
     override fun setPresenter(presenter: LoginContract.Presenter) {
-        this.mPresenter = checkNotNull(presenter)
+        //do nothing- presenter is already injected
     }
 
     override val isActive: Boolean
@@ -127,9 +141,12 @@ class LoginFragment : Fragment(), LoginContract.View {
         return matcher.matches()
     }
 
-    companion object {
+    override fun onDestroy() {
+        super.onDestroy()
+        destroyInjector()
+    }
 
-        private val EMAIL_PATTERN = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
+    companion object {
 
         fun newInstance(): LoginFragment {
             return LoginFragment()
