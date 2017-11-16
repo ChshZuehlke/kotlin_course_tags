@@ -1,10 +1,10 @@
 package ch.zuehlke.sbb.reddit.features.detail
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
 import com.google.common.base.Preconditions.checkNotNull
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
@@ -17,6 +17,7 @@ class DetailPresenter(detailView: DetailContract.View, repository: RedditReposit
     private val mRedditUrl: String
     private val mDetailView: DetailContract.View
     private val mRepository: RedditRepository
+    private val mDisposables = CompositeDisposable()
 
     init {
         mRepository = checkNotNull(repository, "The repository cannot be null")
@@ -30,13 +31,17 @@ class DetailPresenter(detailView: DetailContract.View, repository: RedditReposit
         loadRedditPosts()
     }
 
+    override fun stop() {
+        mDisposables.dispose()
+    }
+
 
     override fun loadRedditPosts() {
         if (mDetailView.isActive) {
             mDetailView.setLoadingIndicator(true)
         }
 
-        mRepository
+        val subscription = mRepository
                 .posts(mRedditUrl)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread(), false, 1)
@@ -55,6 +60,11 @@ class DetailPresenter(detailView: DetailContract.View, repository: RedditReposit
                                 showRedditPosts(posts)
                             }
                         })
+
+        mDisposables.add(subscription)
     }
 
+    companion object {
+        const val TAG = "DetailPresenter"
+    }
 }

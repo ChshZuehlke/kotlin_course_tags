@@ -33,7 +33,6 @@ private constructor(val context: Context, val redditAPI: RedditAPI, gson: Gson, 
         checkNotNull(redditAPI, { "The reddit API cannot be null" })
         mGson = gson
         mType = type
-
     }
 
     override val news: Flowable<List<RedditNewsData>>

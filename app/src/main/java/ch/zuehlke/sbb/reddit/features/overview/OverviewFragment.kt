@@ -11,14 +11,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.detail.DetailActivity
-import ch.zuehlke.sbb.reddit.features.overview.adapter.impl.RedditNewsDelegateAdapter
 import ch.zuehlke.sbb.reddit.features.overview.adapter.impl.RedditNewsDelegateAdapter.OnNewsSelectedListener
 import ch.zuehlke.sbb.reddit.features.overview.adapter.impl.RedditOverviewAdapter
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
-
 import com.google.common.base.Preconditions.checkNotNull
 
 /**
@@ -82,6 +79,11 @@ class OverviewFragment : Fragment(), OverviewContract.View {
     override fun onResume() {
         super.onResume()
         mOverviewPresenter!!.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mOverviewPresenter!!.stop()
     }
 
     override fun setPresenter(presenter: OverviewContract.Presenter) {

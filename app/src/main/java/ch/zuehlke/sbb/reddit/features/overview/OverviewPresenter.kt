@@ -1,13 +1,13 @@
 package ch.zuehlke.sbb.reddit.features.overview
 
-
-import android.content.ContentValues.TAG
 import android.util.Log
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import com.google.common.base.Preconditions.checkNotNull
+import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.Flowables
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.ResourceSubscriber
 
@@ -15,11 +15,10 @@ import io.reactivex.subscribers.ResourceSubscriber
  * Created by chsc on 11.11.17.
  */
 
+
 class OverviewPresenter(private val view: OverviewContract.View, private val redditRepository: RedditRepository) : OverviewContract.Presenter {
 
-    private var mFirstLoad = true
-
-    abstract class PageSubscriber : ResourceSubscriber<List<RedditNewsData>>() {
+    abstract class PageSubscriber : ResourceSubscriber<Pair<Boolean, List<RedditNewsData>>>() {
         override fun onStart() {
             nextPage()
         }
@@ -30,10 +29,11 @@ class OverviewPresenter(private val view: OverviewContract.View, private val red
         }
     }
 
-    val reddidSubscriber = object : PageSubscriber() {
-        override fun onNext(page: List<RedditNewsData>?) {
-            Log.d(TAG, "Got page with ${page?.size} entries")
-            page?.let { processTasks(it, true) }
+    fun createReddidSubscriber() = object : PageSubscriber() {
+        override fun onNext(response: Pair<Boolean, List<RedditNewsData>>) {
+            val (isFirst, page) = response
+            Log.d(TAG, "Got ${if(isFirst) "first" else "next"} page with ${page.size} entries")
+            processTasks(page, !isFirst)
         }
 
         override fun onComplete() {
@@ -45,43 +45,50 @@ class OverviewPresenter(private val view: OverviewContract.View, private val red
         }
     }
 
-    val redditDisposable: Disposable
-
+    val disoposable = CompositeDisposable()
+    var reddidSubscriber: PageSubscriber? = null
 
     init {
         checkNotNull(view, "OverviewView cannot be null")
         checkNotNull(redditRepository, "RedditRepository cannot be null")
         view.setPresenter(this)
-        redditDisposable = redditRepository.news
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread(), false, 1)
-                .subscribeWith(reddidSubscriber)
     }
 
     override fun start() {
-        loadRedditNews(false)
+        loadRedditNews(true)
     }
 
-    override fun loadRedditNews(forceUpdate: Boolean) {
-        // Simplification for sample: a network reload will be forced on first load.
-        loadRedditNews(forceUpdate || mFirstLoad, true)
-        mFirstLoad = false
-
+    override fun stop() {
+        disoposable.dispose()
     }
-
 
     override fun showRedditNews(redditNewsData: RedditNewsData) {
         checkNotNull(redditNewsData, "redditNewsData cannot be null!")
         view.showRedditNewsDetails(redditNewsData.id!!)
     }
 
+    override fun loadRedditNews(forceUpdate: Boolean) {
+        loadRedditNews(forceUpdate, true)
+    }
 
     override fun loadMoreRedditNews() {
-        reddidSubscriber.nextPage()
+        loadRedditNews(false)
     }
 
     private fun loadRedditNews(forceUpdate: Boolean, showLoadingUI: Boolean) {
-        reddidSubscriber.nextPage()
+        if(forceUpdate || reddidSubscriber == null) {
+            Log.d(TAG, "Create new subscription")
+            reddidSubscriber = createReddidSubscriber()
+            disoposable.add(
+                    Flowables.zip(
+                            Flowable.just(true, false),
+                            redditRepository.news)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread(), false, 1)
+                    .subscribeWith(reddidSubscriber!!)
+            )
+        }
+        reddidSubscriber!!.nextPage()
     }
 
     private fun processTasks(news: List<RedditNewsData>, added: Boolean) {
@@ -101,5 +108,9 @@ class OverviewPresenter(private val view: OverviewContract.View, private val red
 
     private fun processEmptyTasks() {
         view.showNoNews()
+    }
+
+    companion object {
+        const val TAG = "OverviewPresenter"
     }
 }

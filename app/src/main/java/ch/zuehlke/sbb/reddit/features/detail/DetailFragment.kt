@@ -11,14 +11,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
-import ch.zuehlke.sbb.reddit.features.overview.InfiniteScrollListener
 import ch.zuehlke.sbb.reddit.features.overview.ScrollChildSwipeRefreshLayout
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
-
 import com.google.common.base.Preconditions.checkNotNull
 
 
@@ -68,6 +63,11 @@ class DetailFragment : Fragment(), DetailContract.View {
     override fun onResume() {
         super.onResume()
         mPresenter!!.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mPresenter!!.stop()
     }
 
     override fun setPresenter(presenter: DetailContract.Presenter) {
