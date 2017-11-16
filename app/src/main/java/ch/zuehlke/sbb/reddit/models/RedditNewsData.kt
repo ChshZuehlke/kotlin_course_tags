@@ -1,8 +1,5 @@
 package ch.zuehlke.sbb.reddit.models
 
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
-import android.widget.Adapter
 import ch.zuehlke.sbb.reddit.features.overview.adapter.AdapterConstants
 import ch.zuehlke.sbb.reddit.features.overview.adapter.ViewType
 
@@ -17,7 +14,7 @@ data class RedditNewsData(
         var created: Long = 0,
         var thumbnailUrl: String? = "",
         var url: String? = "",
-        @PrimaryKey var id: String = "",
+        var id: String = "",
         var permaLink: String = ""
 
 ): ViewType{
