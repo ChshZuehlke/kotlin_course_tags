@@ -18,7 +18,7 @@ class RedditNewsData : ViewType {
     var id: String? = null
     var permaLink: String? = null
 
-    constructor(author: String, title: String, numberOfComments: Int, created: Long, thumbnailUrl: String, url: String, id: String, permaLink: String) {
+    constructor(author: String?, title: String?, numberOfComments: Int, created: Long, thumbnailUrl: String?, url: String?, id: String?, permaLink: String?) {
         this.author = author
         this.title = title
         this.numberOfComments = numberOfComments

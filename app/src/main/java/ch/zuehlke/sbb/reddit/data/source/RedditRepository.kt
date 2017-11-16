@@ -15,6 +15,7 @@ import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import com.google.common.base.Preconditions.checkNotNull
 import io.reactivex.Flowable
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
  * Created by chsc on 08.11.17.
@@ -24,7 +25,8 @@ class RedditRepository// Prevent direct instantiation.
 private constructor(val newsRemoteDataSource: RedditDataSource, val newsLocalDataSource: RedditDataSource) : RedditDataSource {
 
     override val news: Flowable<List<RedditNewsData>>
-        get() = Flowable.merge(listOf(newsLocalDataSource.news, newsRemoteDataSource.news), 1, 1)
+        get() = Flowable
+                .merge(listOf(newsLocalDataSource.news, newsRemoteDataSource.news), 1, 1)
 
     override fun posts(title: String): Observable<List<RedditPostsData>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

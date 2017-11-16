@@ -35,36 +35,28 @@ private constructor(val context: Context, val redditAPI: RedditAPI) : RedditData
                         ""
                     },
                     fun(next: String, emitter: Emitter<List<RedditNewsData>>): String {
-                        Log.d(TAG, "Next page id available: $next")
-                        val requestNews = requestNews(next)
+                        val nextTag = next
+                        Log.d(TAG, "Next page id available: '$nextTag'")
+                        Log.d(TAG, "Running flowable on thread ${Thread.currentThread().name}")
+
+                        val requestNews = requestNews(nextTag).subscribeOn(Schedulers.io())
 
                         Log.d(TAG, "Waiting for the response")
-                        val (news, nextTag) = requestNews.blockingGet()
-                        emitter.onNext(news.mapNotNull { it })
-                        return nextTag?:""
+                        requestNews.subscribe { (news, _) ->
+                            Log.d(TAG, "Received page")
+                            emitter.onNext(news.mapNotNull { it })
+                        }
+                        return requestNews.blockingGet().second ?: ""
                     })
         }
 
     private fun requestNews(after: String): Single<Pair<List<RedditNewsData?>, String?>> {
         val newsSource = redditAPI.getSortedNews("hot", after, "10")
-        val subscribeOnIo = newsSource.subscribeOn(Schedulers.io())
-        return subscribeOnIo.map { response ->
+        Log.d(TAG, "Running on thread ${Thread.currentThread().name}")
+        return newsSource.map { response ->
             val news = response.data?.children?.map { child ->
                 child.data?.let { d ->
-                    d.author?.let { author ->
-                        d.title?.let { title ->
-                            d.thumbnail?.let { thumbnail ->
-                                d.url?.let { url ->
-                                    d.id?.let { id ->
-                                        d.permalink?.let { permalink ->
-                                            RedditNewsData(author, title, d.num_comments, d.created, thumbnail, url, id, permalink)
-                                        }
-                                    }
-
-                                }
-                            }
-                        }
-                    }
+                    RedditNewsData(d.author, d.title, d.num_comments, d.created, d.thumbnail, d.url, d.id, d.permalink)
                 }
             } ?: emptyList()
             Pair(news, response.data?.after)

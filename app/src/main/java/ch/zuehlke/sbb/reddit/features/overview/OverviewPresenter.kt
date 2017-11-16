@@ -3,12 +3,10 @@ package ch.zuehlke.sbb.reddit.features.overview
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
-
 import com.google.common.base.Preconditions.checkNotNull
-import io.reactivex.annotations.SchedulerSupport
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.ResourceSubscriber
@@ -55,8 +53,9 @@ class OverviewPresenter(private val view: OverviewContract.View, private val red
         checkNotNull(redditRepository, "RedditRepository cannot be null")
         view.setPresenter(this)
         redditDisposable = redditRepository.news
-                    .observeOn(Schedulers.io(), false, 1)
-                    .subscribeWith(reddidSubscriber)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread(), false, 1)
+                .subscribeWith(reddidSubscriber)
     }
 
     override fun start() {

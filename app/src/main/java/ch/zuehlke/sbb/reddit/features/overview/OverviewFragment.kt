@@ -70,8 +70,6 @@ class OverviewFragment : Fragment(), OverviewContract.View {
         mNewsView!!.clearOnScrollListeners()
         mNewsView!!.addOnScrollListener(infiniteScrollListener)
 
-        addRedditNews(mNews)
-
         return root
     }
 
@@ -108,10 +106,8 @@ class OverviewFragment : Fragment(), OverviewContract.View {
         mNoNewsView!!.visibility = View.GONE
     }
 
-    private var mNews: List<RedditNewsData> = emptyList()
 
     override fun addRedditNews(redditNews: List<RedditNewsData>) {
-        mNews = redditNews
         mOverviewAdapter?.addRedditNews(redditNews)
     }
 
