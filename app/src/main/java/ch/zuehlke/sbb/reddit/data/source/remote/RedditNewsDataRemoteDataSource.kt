@@ -97,46 +97,36 @@ private constructor(val context: Context, val redditAPI: RedditAPI, gson: Gson, 
     }
 
     private fun flattenRetrofitResponse(response: List<RedditPostElement>, parentPermaLink: String): List<RedditPostsData> {
-        val flatten = ArrayList<RedditPostsData>()
-        /*
-        FIXME: use proper FP
-        val elements = response
+        return response
                 .filter { it is RedditPostElement.DataRedditPostElement }
                 .map { it as RedditPostElement.DataRedditPostElement }
-
-        elements.filter { it.data != null && !Strings.isNullOrEmpty(it.data.body_html)}
-          */
-
-        for (redditPostElement in response) {
-            if (redditPostElement is RedditPostElement.DataRedditPostElement) {
-                redditPostElement.data?.let { data ->
-                    if (!Strings.isNullOrEmpty(data.body_html)) {
-                        val postData = RedditPostsData(data.id!!, null, data.author!!, data.body!!, data.created_utc, data.depth, data.body_html!!, data.permalink!!, order++.toLong())
-                        flatten.add(postData)
-                    } else {
-                        flatten.addAll(recursivlyParseResponse(data.id, parentPermaLink, data))
-                    }
+                .flatMap { redditPostElement ->
+                    redditPostElement.data?.let { data ->
+                        if (!Strings.isNullOrEmpty(redditPostElement.data.body_html))
+                            listOf(RedditPostsData(data.id!!, null, data.author, data.body, data.created_utc, data.depth, data.body_html, data.permalink, order++.toLong()))
+                        else
+                            recursivlyParseResponse(data.id, parentPermaLink, data)
+                    } ?: emptyList()
                 }
-            }
-        }
-        return flatten
     }
 
     private fun recursivlyParseResponse(parentId: String?, parentPermaLink: String, redditPost: RedditPost): List<RedditPostsData> {
-        val posts = ArrayList<RedditPostsData>()
-        for (child in redditPost.children ?: emptyList()) {
-            if (child is RedditPostElement.DataRedditPostElement) {
-                child.data?.let { data ->
-                    posts.add(RedditPostsData(data.id!!, parentId, data.author, data.body, data.created_utc, data.depth, data.body_html, parentPermaLink, order++.toLong()))
-                    data.replies?.let { replies ->
-                        if (replies is RedditPostElement.DataRedditPostElement)
-                            posts.addAll(recursivlyParseResponse(data.id!!, parentPermaLink, replies.data!!))
-                    }
+        val children = redditPost.children ?: emptyList()
+        return children
+                .filter { it is RedditPostElement.DataRedditPostElement }
+                .map { it as RedditPostElement.DataRedditPostElement }
+                .flatMap { redditPostElement ->
+                    redditPostElement.data?.let { data ->
+                        val post = RedditPostsData(data.id!!, parentId, data.author, data.body, data.created_utc, data.depth, data.body_html, data.permalink, order++.toLong())
+                        val subPosts = data.replies?.let { replies ->
+                            if (replies is RedditPostElement.DataRedditPostElement && replies.data != null)
+                                recursivlyParseResponse(data.id!!, parentPermaLink, replies.data)
+                            else
+                                emptyList()
+                        } ?: emptyList()
+                        listOf(post) + subPosts
+                    } ?: emptyList()
                 }
-            }
-
-        }
-        return posts
     }
 
 
