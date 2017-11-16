@@ -27,13 +27,13 @@ import com.google.gson.Gson
  * Created by chsc on 08.11.17.
  */
 
-class RedditNewsDataRemoteDataSource// Prevent direct instantiation.
-private constructor(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
+class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
     private var after = ""
     private var order = -1
     private val mRedditAPI: RedditAPI
     private val mGson: Gson
     private val mType: Type
+    private val TAG = "RemoteDataSource"
 
     init {
         checkNotNull(context)
@@ -192,19 +192,5 @@ private constructor(context: Context, redditAPI: RedditAPI, gson: Gson, type: Ty
 
     override fun saveRedditNews(data: RedditNewsData) {
         // In this demo app we do not support posting of news, therefore not implemented.
-    }
-
-    companion object {
-
-        private val TAG = "RemoteDataSource"
-
-        private var INSTANCE: RedditNewsDataRemoteDataSource? = null
-
-        fun getInstance(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type): RedditNewsDataRemoteDataSource {
-            if (INSTANCE == null) {
-                INSTANCE = RedditNewsDataRemoteDataSource(context, redditAPI, gson, type)
-            }
-            return INSTANCE!!
-        }
     }
 }
