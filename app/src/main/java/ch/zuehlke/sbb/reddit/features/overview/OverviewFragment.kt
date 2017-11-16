@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.features.GenericBindingBaseAdapter
 import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
 import ch.zuehlke.sbb.reddit.features.detail.DetailActivity
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
@@ -30,9 +29,9 @@ class OverviewFragment : Fragment(), OverviewContract.View {
     private var mNewsView: RecyclerView? = null
 
 
-    private val clickListener =  object: GenericBindingViewHolder.GenericBindingClickListener{
+    private val clickListener = object : GenericBindingViewHolder.GenericBindingClickListener {
         override fun onItemSelected(obj: Any) {
-            if(obj is RedditNewsData && obj.permaLink != null){
+            if (obj is RedditNewsData && obj.permaLink != null) {
                 showRedditNewsDetails(obj.permaLink!!)
             }
         }
@@ -62,7 +61,7 @@ class OverviewFragment : Fragment(), OverviewContract.View {
         swipeRefreshLayout.setScrollUpChild(mNewsView!!)
         swipeRefreshLayout.setOnRefreshListener {
             infiniteScrollListener.reset()
-            mOverviewPresenter!!.loadRedditNews(false)
+            mOverviewPresenter!!.loadRedditNews(true)
         }
 
 

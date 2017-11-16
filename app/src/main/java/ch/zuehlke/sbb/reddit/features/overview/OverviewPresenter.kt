@@ -7,9 +7,11 @@ import com.google.common.base.Preconditions.checkNotNull
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Flowables
+import io.reactivex.functions.BiFunction
+import io.reactivex.internal.functions.Functions
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.ResourceSubscriber
+import org.reactivestreams.Publisher
 
 /**
  * Created by chsc on 11.11.17.
@@ -30,9 +32,9 @@ class OverviewPresenter(private val view: OverviewContract.View, private val red
     }
 
     fun createReddidSubscriber() = object : PageSubscriber() {
-        override fun onNext(response: Pair<Boolean, List<RedditNewsData>>) {
-            val (isFirst, page) = response
-            Log.d(TAG, "Got ${if(isFirst) "first" else "next"} page with ${page.size} entries")
+        override fun onNext(result: Pair<Boolean, List<RedditNewsData>>) {
+            val (isFirst, page) = result
+            Log.d(TAG, "Got page with ${page.size} entries")
             processTasks(page, !isFirst)
         }
 
@@ -75,14 +77,28 @@ class OverviewPresenter(private val view: OverviewContract.View, private val red
         loadRedditNews(false)
     }
 
+    /**
+     * Allow to use zip without having a prefetch size of 128
+     */
+    fun <T1,T2> zip(source1: Publisher<T1>, source2: Publisher<T2>): Flowable<Pair<T1, T2>> {
+        return zip(source1, source2, BiFunction<T1, T2, Pair<T1, T2>>{ a, b -> Pair(a, b) })
+    }
+    fun <T1, T2, R> zip(source1: Publisher<out T1>, source2: Publisher<out T2>, zipper: BiFunction<in T1, in T2, out R>): Flowable<R> {
+        return Flowable.zipArray<Any, R>(Functions.toFunction(zipper), false, 1, source1, source2)
+    }
+
     private fun loadRedditNews(forceUpdate: Boolean, showLoadingUI: Boolean) {
+        if(showLoadingUI)
+            view.setLoadingIndicator(true)
         if(forceUpdate || reddidSubscriber == null) {
             Log.d(TAG, "Create new subscription")
             reddidSubscriber = createReddidSubscriber()
+
             disoposable.add(
-                    Flowables.zip(
-                            Flowable.just(true, false),
-                            redditRepository.news)
+                    zip(
+                            Flowable.concat(Flowable.just(true), Flowable.just(false).repeat()),
+                            redditRepository.news
+                    )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread(), false, 1)
                     .subscribeWith(reddidSubscriber!!)
@@ -101,6 +117,7 @@ class OverviewPresenter(private val view: OverviewContract.View, private val red
                 view.addRedditNews(news)
             } else {
                 view.showRedditNews(news)
+                view.setLoadingIndicator(false)
             }
 
         }
