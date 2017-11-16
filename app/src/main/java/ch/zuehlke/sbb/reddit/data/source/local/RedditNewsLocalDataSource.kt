@@ -2,8 +2,6 @@ package ch.zuehlke.sbb.reddit.data.source.local
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
 
 import java.util.ArrayList
 
@@ -12,18 +10,21 @@ import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
 
 import com.google.common.base.Preconditions.checkNotNull
+import de.dabotz.shoppinglist.database.AppDatabase
 
 /**
  * Created by chsc on 08.11.17.
  */
 
-class RedditNewsLocalDataSource constructor(context: Context) : RedditDataSource {
+class RedditNewsLocalDataSource constructor(context: Context, db: AppDatabase) : RedditDataSource {
 
     private val mDbHelper: RedditNewsDataHelper
+    private val mDb: AppDatabase
 
     init {
         checkNotNull(context)
         mDbHelper = RedditNewsDataHelper(context)
+        mDb = db
     }
 
     override fun getMoreNews(callback: RedditDataSource.LoadNewsCallback) {
@@ -31,32 +32,8 @@ class RedditNewsLocalDataSource constructor(context: Context) : RedditDataSource
     }
 
     override fun getNews(callback: RedditDataSource.LoadNewsCallback) {
-        val redditNews = ArrayList<RedditNewsData>()
-        val db = mDbHelper.readableDatabase
+        val redditNews = mDb.redditNewsDataDao().getNews();
 
-        val projection = arrayOf(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_URL, RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_TITLE, RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_THUMBNAIL, RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_PERMA_LINK, RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_CREATED, RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_COMMENTS, RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_AUTHOR, RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_ID)
-
-        val c = db.query(
-                RedditNewsPersistenceContract.RedditNewsEntry.TABLE_NAME, projection, null, null, null, null, null)
-
-        if (c != null && c.count > 0) {
-            while (c.moveToNext()) {
-                val newsId = c.getString(c.getColumnIndexOrThrow(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_ID))
-                val title = c.getString(c.getColumnIndexOrThrow(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_TITLE))
-                val author = c.getString(c.getColumnIndexOrThrow(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_AUTHOR))
-                val created = c.getLong(c.getColumnIndexOrThrow(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_CREATED))
-                val comments = c.getInt(c.getColumnIndexOrThrow(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_COMMENTS))
-                val thumbnail = c.getString(c.getColumnIndexOrThrow(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_THUMBNAIL))
-                val permaLink = c.getString(c.getColumnIndexOrThrow(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_PERMA_LINK))
-                val url = c.getString(c.getColumnIndexOrThrow(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_URL))
-
-                val data = RedditNewsData(author, title, comments, created, thumbnail, url, newsId, permaLink)
-                redditNews.add(data)
-            }
-        }
-        c?.close()
-
-        db.close()
 
         if (redditNews.isEmpty()) {
             // This will be called if the table is new or just empty.
@@ -148,24 +125,9 @@ class RedditNewsLocalDataSource constructor(context: Context) : RedditDataSource
         db.close()
     }
 
-    override fun saveRedditNews(data: RedditNewsData) {
+    override fun saveRedditNews(data: List<RedditNewsData>) {
         checkNotNull(data)
-        val db = mDbHelper.writableDatabase
-
-        val values = ContentValues()
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_AUTHOR, data.author)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_COMMENTS, data.numberOfComments)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_CREATED, data.created)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_ID, data.id)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_PERMA_LINK, data.permaLink)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_THUMBNAIL, data.thumbnailUrl)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_TITLE, data.title)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_URL, data.url)
-
-
-        db.insert(RedditNewsPersistenceContract.RedditNewsEntry.TABLE_NAME, null, values)
-
-        db.close()
+        mDb.redditNewsDataDao().addNewsItem(data)
     }
 
 }

@@ -11,7 +11,6 @@ import android.database.sqlite.SQLiteOpenHelper
 class RedditNewsDataHelper(context: Context) : SQLiteOpenHelper(context, RedditNewsDataHelper.DATABASE_NAME, null, RedditNewsDataHelper.DATABASE_VERSION) {
 
     override fun onCreate(sqLiteDatabase: SQLiteDatabase) {
-        sqLiteDatabase.execSQL(SQL_CREATE_ENTRIES)
         sqLiteDatabase.execSQL(SQL_CREATE_POST_ENTRIES)
     }
 
@@ -32,16 +31,7 @@ class RedditNewsDataHelper(context: Context) : SQLiteOpenHelper(context, RedditN
         private val COMMA_SEP = ","
 
 
-        private val SQL_CREATE_ENTRIES = "CREATE TABLE " + RedditNewsPersistenceContract.RedditNewsEntry.TABLE_NAME + " (" +
-                RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_ID + TEXT_TYPE + " PRIMARY_KEY" + COMMA_SEP +
-                RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_AUTHOR + TEXT_TYPE + COMMA_SEP +
-                RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_COMMENTS + LONG_TYPE + COMMA_SEP +
-                RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_CREATED + LONG_TYPE + COMMA_SEP +
-                RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_PERMA_LINK + TEXT_TYPE + COMMA_SEP +
-                RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_THUMBNAIL + TEXT_TYPE + COMMA_SEP +
-                RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP +
-                RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_URL + TEXT_TYPE +
-                " )"
+
         private val SQL_CREATE_POST_ENTRIES = "CREATE TABLE " + RedditNewsPersistenceContract.RedditPostEntry.TABLE_NAME + " (" +
                 RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_ID + TEXT_TYPE + " PRIMARY_KEY" + COMMA_SEP +
                 RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_AUTHOR + TEXT_TYPE + COMMA_SEP +

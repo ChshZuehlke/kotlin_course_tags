@@ -49,7 +49,7 @@ class FakeRedditNewsRemoteDataSource// Prevent direct instantiation.
     }
 
 
-    override fun saveRedditNews(@NonNull data: RedditNewsData) {
+    override fun saveRedditNews(@NonNull data: List<RedditNewsData>) {
         // In this demo app we do not support posting of news, therefore not implemented.
     }
 

@@ -1,12 +1,14 @@
 package ch.zuehlke.sbb.reddit.models
 
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 import ch.zuehlke.sbb.reddit.features.overview.adapter.AdapterConstants
 import ch.zuehlke.sbb.reddit.features.overview.adapter.ViewType
 
 /**
  * Created by chsc on 08.11.17.
  */
-
+@Entity
 data class RedditNewsData(
         var author: String? = null,
         var title: String? = null,
@@ -14,7 +16,7 @@ data class RedditNewsData(
         var created: Long = 0,
         var thumbnailUrl: String? = "",
         var url: String? = "",
-        var id: String = "",
+        @PrimaryKey var id: String = "",
         var permaLink: String = ""
 
 ): ViewType{

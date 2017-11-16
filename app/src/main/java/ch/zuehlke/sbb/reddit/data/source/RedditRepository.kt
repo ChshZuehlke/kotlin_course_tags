@@ -2,7 +2,6 @@ package ch.zuehlke.sbb.reddit.data.source
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 
 import java.util.ArrayList
 import java.util.LinkedHashMap
@@ -97,9 +96,7 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
                 // If the cache is dirty we need to fetch new data from the network. The Cache is only dirty, when a refreshNews is going on
                 getNewsFromRemoteDataSource(object : RedditDataSource.LoadNewsCallback {
                     override fun onNewsLoaded(data: List<RedditNewsData>) {
-                        for (newsData in data) {
-                            saveRedditNews(newsData)
-                        }
+                        saveRedditNews(data)
                         refreshCache(data)
                         callback.onNewsLoaded(ArrayList(mCacheNews!!.values))
                     }
@@ -182,16 +179,19 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
         mCacheNews!!.clear()
     }
 
-    override fun saveRedditNews(data: RedditNewsData) {
+    override fun saveRedditNews(data: List<RedditNewsData>) {
         checkNotNull(data)
 
         mRedditNewsLocalDataSource.saveRedditNews(data)
         mRedditNewsRemoteDataSource.saveRedditNews(data) // Although we call saveRedditNews() on the remote datasource, it is not implemented.
         // Do in memory cache update to keep the app UI up to date
-        if (mCacheNews == null) {
-            mCacheNews = LinkedHashMap<String, RedditNewsData>()
+        for (elem in data){
+            if (mCacheNews == null) {
+                mCacheNews = LinkedHashMap<String, RedditNewsData>()
+            }
+            mCacheNews!!.put(elem.id!!, elem)
         }
-        mCacheNews!!.put(data.id!!, data)
+
     }
 
     private fun getNewsFromRemoteDataSource(callback: RedditDataSource.LoadNewsCallback) {
@@ -220,16 +220,15 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
     }
 
     private fun updateLocalDataSource(news: List<RedditNewsData>) {
-        for (data in news) {
-            mRedditNewsLocalDataSource.saveRedditNews(data)
-        }
+        mRedditNewsLocalDataSource.saveRedditNews(news)
+
     }
 
     private fun refreshLocalDataSource(news: List<RedditNewsData>) {
         mRedditNewsLocalDataSource.deleteAllNews()
-        for (data in news) {
-            mRedditNewsLocalDataSource.saveRedditNews(data)
-        }
+
+        mRedditNewsLocalDataSource.saveRedditNews(news)
+
     }
 
 }
