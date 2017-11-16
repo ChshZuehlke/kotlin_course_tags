@@ -1,9 +1,25 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="obj"
+            type="ch.zuehlke.sbb.reddit.models.RedditPostsData" />
+
+        <variable
+            name="listener"
+            type="ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder.GenericBindingClickListener"/>
+    </data>
+
+<RelativeLayout
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="5dp">
+    android:paddingRight="5dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:paddingLeft="@{obj.depth}"
+    >
 
 
 
@@ -11,7 +27,7 @@
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="u/itsnotmyf4ult"
+        android:text="@{obj.author}"
         android:textSize="10sp"
         android:paddingRight="5dp"
         />
@@ -33,6 +49,7 @@
         android:layout_toEndOf="@id/middleDot"
         android:text="6 hrs"
         android:textSize="10sp"
+        app:friendlyTime="@{obj.createdUtc}"
         />
 
 
@@ -43,7 +60,8 @@
         android:id="@+id/text"
         android:textColor="@android:color/black"
         android:textSize="12sp"
-        android:text="This is my awesome text dakdas adjasdl jaddl adjas dja adkjdal asldja lajd al aasldj "
+        android:text="@{obj.body}"
         />
 
 </RelativeLayout>
+</layout>

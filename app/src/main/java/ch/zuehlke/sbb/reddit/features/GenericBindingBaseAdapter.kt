@@ -1,4 +1,4 @@
-package ch.zuehlke.sbb.reddit.features.overview.adapter
+package ch.zuehlke.sbb.reddit.features
 
 import android.databinding.DataBindingUtil
 import android.databinding.ViewDataBinding
@@ -10,7 +10,8 @@ import android.view.LayoutInflater
  */
 
 
-abstract class GenericBindingBaseAdapter : RecyclerView.Adapter<GenericBindingViewHolder>() {
+abstract class GenericBindingBaseAdapter(val clickListener: GenericBindingViewHolder.GenericBindingClickListener) : RecyclerView.Adapter<GenericBindingViewHolder>() {
+
 
 
     override fun onBindViewHolder(holder: GenericBindingViewHolder, position: Int) {
@@ -21,7 +22,7 @@ abstract class GenericBindingBaseAdapter : RecyclerView.Adapter<GenericBindingVi
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): GenericBindingViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: ViewDataBinding = DataBindingUtil.inflate(inflater, viewType, parent, false)
-        return GenericBindingViewHolder(binding)
+        return GenericBindingViewHolder(binding,clickListener)
     }
 
 
