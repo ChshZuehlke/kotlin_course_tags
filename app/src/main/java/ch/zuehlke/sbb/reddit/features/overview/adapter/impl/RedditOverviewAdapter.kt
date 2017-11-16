@@ -18,8 +18,7 @@ import ch.zuehlke.sbb.reddit.models.RedditNewsData
 class RedditOverviewAdapter(listener: RedditNewsDelegateAdapter.OnNewsSelectedListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val loadingItem = object : ViewType {
-        override val viewType: Int
-            get() = AdapterConstants.LOADING
+        override fun getViewType() = AdapterConstants.LOADING
     }
 
     private val mItems = ArrayList<ViewType>()
@@ -65,6 +64,6 @@ class RedditOverviewAdapter(listener: RedditNewsDelegateAdapter.OnNewsSelectedLi
     }
 
     override fun getItemViewType(position: Int): Int {
-        return mItems[position].viewType
+        return mItems[position].getViewType()
     }
 }
