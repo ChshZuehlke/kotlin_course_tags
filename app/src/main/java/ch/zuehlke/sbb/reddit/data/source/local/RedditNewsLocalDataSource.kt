@@ -2,8 +2,6 @@ package ch.zuehlke.sbb.reddit.data.source.local
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
 
 import java.util.ArrayList
 
@@ -148,24 +146,31 @@ class RedditNewsLocalDataSource constructor(context: Context) : RedditDataSource
         db.close()
     }
 
-    override fun saveRedditNews(data: RedditNewsData) {
+    override fun saveRedditNews(data: List<RedditNewsData>) {
         checkNotNull(data)
         val db = mDbHelper.writableDatabase
 
-        val values = ContentValues()
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_AUTHOR, data.author)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_COMMENTS, data.numberOfComments)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_CREATED, data.created)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_ID, data.id)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_PERMA_LINK, data.permaLink)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_THUMBNAIL, data.thumbnailUrl)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_TITLE, data.title)
-        values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_URL, data.url)
+        for (item in data){
+
+            val values = ContentValues()
+            values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_AUTHOR, item.author)
+            values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_COMMENTS, item.numberOfComments)
+            values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_CREATED, item.created)
+            values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_ID, item.id)
+            values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_PERMA_LINK, item.permaLink)
+            values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_THUMBNAIL, item.thumbnailUrl)
+            values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_TITLE, item.title)
+            values.put(RedditNewsPersistenceContract.RedditNewsEntry.COLUMN_NAME_URL, item.url)
 
 
-        db.insert(RedditNewsPersistenceContract.RedditNewsEntry.TABLE_NAME, null, values)
+            db.insert(RedditNewsPersistenceContract.RedditNewsEntry.TABLE_NAME, null, values)
+
+
+        }
 
         db.close()
+
+
     }
 
 }

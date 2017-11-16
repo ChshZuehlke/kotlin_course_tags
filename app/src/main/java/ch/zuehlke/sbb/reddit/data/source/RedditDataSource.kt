@@ -38,5 +38,5 @@ interface RedditDataSource {
 
     fun deleteAllNews()
 
-    fun saveRedditNews(data: RedditNewsData)
+    fun saveRedditNews(data: List<RedditNewsData>)
 }
