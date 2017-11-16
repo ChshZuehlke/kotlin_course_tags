@@ -103,24 +103,27 @@ class RedditNewsLocalDataSource constructor(context: Context) : RedditDataSource
         }
     }
 
-    override fun savePosts(data: RedditPostsData) {
+    override fun savePosts(data: List<RedditPostsData>) {
 
         checkNotNull(data)
         val db = mDbHelper.writableDatabase
 
-        val values = ContentValues()
-        values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_AUTHOR, data.author)
-        values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_BODY, data.body)
-        values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_CREATED, data.createdUtc)
-        values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_ID, data.id)
-        values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_PARENTPERMALINK, data.parentPermaLink)
-        values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_DEPTH, data.depth)
-        values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_PARENT_ID, data.parentId)
-        values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_BODY_HTML, data.body_html)
-        values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_ORDERING, data.ordering)
+        for (item in data){
+            val values = ContentValues()
+            values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_AUTHOR, item.author)
+            values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_BODY, item.body)
+            values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_CREATED, item.createdUtc)
+            values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_ID, item.id)
+            values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_PARENTPERMALINK, item.parentPermaLink)
+            values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_DEPTH, item.depth)
+            values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_PARENT_ID, item.parentId)
+            values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_BODY_HTML, item.body_html)
+            values.put(RedditNewsPersistenceContract.RedditPostEntry.COLUMN_NAME_ORDERING, item.ordering)
 
 
-        db.insert(RedditNewsPersistenceContract.RedditPostEntry.TABLE_NAME, null, values)
+            db.insert(RedditNewsPersistenceContract.RedditPostEntry.TABLE_NAME, null, values)
+        }
+
 
         db.close()
 

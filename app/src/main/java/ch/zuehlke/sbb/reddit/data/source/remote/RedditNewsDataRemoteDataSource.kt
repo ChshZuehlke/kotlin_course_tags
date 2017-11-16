@@ -115,7 +115,7 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
 
     }
 
-    override fun savePosts(data: RedditPostsData) {
+    override fun savePosts(data: List<RedditPostsData>) {
         //Remotly its not used
     }
 
