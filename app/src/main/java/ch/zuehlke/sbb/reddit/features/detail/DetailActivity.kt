@@ -8,6 +8,7 @@ import android.util.Log
 import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.extensions.addFragment
+import ch.zuehlke.sbb.reddit.extensions.logI
 
 /**
  * Created by chsc on 11.11.17.
@@ -28,7 +29,7 @@ class DetailActivity : AppCompatActivity() {
         ab!!.setDisplayHomeAsUpEnabled(false)
 
         val redditUrl = intent.getStringExtra(EXTRA_REDDIT_NEWS_URL)
-        Log.i(TAG, "RedditUrl: " + redditUrl)
+        logI("RedditUrl: $redditUrl")
         var detailFragment: DetailFragment? = supportFragmentManager.findFragmentById(R.id.contentFrame) as DetailFragment?
         if (detailFragment == null) {
             // Create the fragment
@@ -43,6 +44,5 @@ class DetailActivity : AppCompatActivity() {
     companion object {
 
         val EXTRA_REDDIT_NEWS_URL = "redditNewsUrl"
-        private val TAG = "DetailActivity"
-    }
+          }
 }
