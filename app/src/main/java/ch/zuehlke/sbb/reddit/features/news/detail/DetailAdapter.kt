@@ -1,4 +1,4 @@
-package ch.zuehlke.sbb.reddit.features.detail
+package ch.zuehlke.sbb.reddit.features.news.detail
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -11,7 +11,6 @@ import android.widget.TextView
 import java.util.ArrayList
 
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import ch.zuehlke.sbb.reddit.util.DateUtils
 
