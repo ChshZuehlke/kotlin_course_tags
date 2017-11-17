@@ -19,12 +19,7 @@ class RedditApp : Application(), KodeinAware{
         bind<AppDatabase>() with eagerSingleton {
             Room.databaseBuilder(this@RedditApp, AppDatabase::class.java, "reddit-db")
                     .addMigrations(MIGRATION_1_2)
-                    .allowMainThreadQueries()
                     .build() }
     }
 
-
-    override fun onCreate() {
-        super.onCreate()
-    }
 }

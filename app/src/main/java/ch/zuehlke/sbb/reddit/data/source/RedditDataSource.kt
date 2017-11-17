@@ -13,7 +13,7 @@ interface RedditDataSource {
 
     val news: Flowable<List<RedditNewsData>>
 
-    fun posts(title: String): Observable<List<RedditPostsData>>
+    fun posts(permaLink: String): Observable<List<RedditPostsData>>
 
     fun savePosts(data: List<RedditPostsData>)
 

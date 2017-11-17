@@ -68,13 +68,13 @@ class RedditNewsDataRemoteDataSource constructor(val context: Context, val reddi
         }
     }
 
-    override fun posts(title: String): Observable<List<RedditPostsData>> {
-        return redditAPI.getRedditPosts(title, "new")
+    override fun posts(permaLink: String): Observable<List<RedditPostsData>> {
+        return redditAPI.getRedditPosts(permaLink, "new")
                 .map { response ->
                     Log.d(TAG, "Loading posts on ${Thread.currentThread().name}")
                     try {
                         val redditPostElements: List<RedditPostElement> = mGson.fromJson<List<RedditPostElement>>(response.string(), mType)
-                        flattenRetrofitResponse(redditPostElements, title)
+                        flattenRetrofitResponse(redditPostElements, permaLink)
                     } catch (e: IOException) {
                         throw Exceptions.propagate(e)
                     }
