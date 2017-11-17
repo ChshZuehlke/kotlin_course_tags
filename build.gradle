@@ -27,12 +27,13 @@ allprojects {
 }
 
 ext{
-    suppport_lib_version = '26.0.2'
+    suppport_lib_version = '26.1.0'
     guavaVersion = '18.0'
     picasso_version = '2.5.2'
     retrofit_version = '2.0.0'
     rx_kotlin = '2.1.0'
     kodein_version = '4.1.0'
+    room_version = '1.0.0'
 }
 
 task clean(type: Delete) {

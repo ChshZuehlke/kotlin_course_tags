@@ -81,7 +81,7 @@ class RedditNewsDataRemoteDataSource constructor(val context: Context, val reddi
                 }.toObservable()
     }
 
-    override fun savePosts(data: RedditPostsData) {
+    override fun savePosts(data: List<RedditPostsData>) {
         //Remotly its not used
     }
 
@@ -131,7 +131,7 @@ class RedditNewsDataRemoteDataSource constructor(val context: Context, val reddi
         // Not supported by Reddit :)
     }
 
-    override fun saveRedditNews(data: RedditNewsData) {
+    override fun saveRedditNews(data: List<RedditNewsData>) {
         // In this demo app we do not support posting of news, therefore not implemented.
     }
 

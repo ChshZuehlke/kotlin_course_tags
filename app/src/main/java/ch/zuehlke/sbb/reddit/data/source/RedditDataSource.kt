@@ -15,7 +15,7 @@ interface RedditDataSource {
 
     fun posts(title: String): Observable<List<RedditPostsData>>
 
-    fun savePosts(data: RedditPostsData)
+    fun savePosts(data: List<RedditPostsData>)
 
     fun deletePostsWithPermaLink(permaLink: String)
 
@@ -23,5 +23,5 @@ interface RedditDataSource {
 
     fun deleteAllNews()
 
-    fun saveRedditNews(data: RedditNewsData)
+    fun saveRedditNews(data: List<RedditNewsData>)
 }
