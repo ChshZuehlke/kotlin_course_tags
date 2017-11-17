@@ -1,4 +1,4 @@
-package ch.zuehlke.sbb.reddit.features.overview
+package ch.zuehlke.sbb.reddit.features.news.overview
 
 
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
@@ -20,7 +20,6 @@ class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRep
     init {
         mOverviewView = checkNotNull(view, "OverviewView cannot be null")
         mRedditRepository = checkNotNull(redditRepository, "RedditRepository cannot be null")
-        view.setPresenter(this)
     }
 
     override fun start() {
@@ -43,12 +42,12 @@ class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRep
 
     override fun loadMoreRedditNews() {
         mRedditRepository.getMoreNews(object : RedditDataSource.LoadNewsCallback {
-            override fun onNewsLoaded(data: List<RedditNewsData>) {
+            override fun onNewsLoaded(news: List<RedditNewsData>) {
                 // The view may not be able to handle UI updates anymore
                 if (!mOverviewView.isActive) {
                     return
                 }
-                processTasks(data, true)
+                processTasks(news, true)
             }
 
             override fun onDataNotAvailable() {
@@ -71,7 +70,7 @@ class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRep
         }
 
         mRedditRepository.getNews(object : RedditDataSource.LoadNewsCallback {
-            override fun onNewsLoaded(newsDataList: List<RedditNewsData>) {
+            override fun onNewsLoaded(news: List<RedditNewsData>) {
                 // The view may not be able to handle UI updates anymore
                 if (!mOverviewView.isActive) {
                     return
@@ -80,7 +79,7 @@ class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRep
                     mOverviewView.setLoadingIndicator(false)
                 }
 
-                processTasks(newsDataList, false)
+                processTasks(news, false)
             }
 
             override fun onDataNotAvailable() {

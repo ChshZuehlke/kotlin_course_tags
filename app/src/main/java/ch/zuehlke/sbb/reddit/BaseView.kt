@@ -6,8 +6,6 @@ package ch.zuehlke.sbb.reddit
 
 interface BaseView<in T> where T: BasePresenter {
 
-    fun setPresenter(presenter: T)
-
 
     val isActive: Boolean
 }
