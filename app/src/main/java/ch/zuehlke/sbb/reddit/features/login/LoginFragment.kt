@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TextInputEditText
 import android.support.v4.app.Fragment
-import android.support.v7.widget.AppCompatButton
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -12,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.ProgressBar
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.overview.OverviewActivity
 import com.google.common.base.Preconditions.checkNotNull
@@ -20,6 +18,7 @@ import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.fragment_login.view.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -29,15 +28,11 @@ import java.util.concurrent.TimeUnit
 class LoginFragment : Fragment(), LoginContract.View {
 
     private var mPresenter: LoginContract.Presenter? = null
-    private var mProgessBar: ProgressBar? = null
-    private var mLoginButton: AppCompatButton? = null
-    private var mUsername: TextInputEditText? = null
-    private var mPassword: TextInputEditText? = null
     private val mDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onResume() {
         super.onResume()
-        mPresenter!!.start()
+        mPresenter?.start()
     }
 
     override fun onPause() {
@@ -45,10 +40,10 @@ class LoginFragment : Fragment(), LoginContract.View {
         mDisposable.dispose()
     }
 
-    private fun textChanges(view: EditText) = Observable.create(ObservableOnSubscribe<String> { e ->
+    private fun textChanges(view: EditText) = Observable.create(ObservableOnSubscribe<String> { emitter ->
         val callback: TextWatcher = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                e.onNext(s.toString())
+                emitter.onNext(s.toString())
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -59,34 +54,52 @@ class LoginFragment : Fragment(), LoginContract.View {
         }
         view.addTextChangedListener(callback)
         Log.d(TAG, "Text changed listener ${callback.hashCode()} to view ${view.id} added")
-        e.setCancellable {
+        emitter.setCancellable {
             view.removeTextChangedListener(callback)
             Log.d(TAG, "Text changed listener ${callback.hashCode()} from view ${view.id} removed")
         }
     })
 
+    private fun <T : View> clicks(view: T) = Observable.create(ObservableOnSubscribe<T> { emitter ->
+        val callback: View.OnClickListener = View.OnClickListener { emitter.onNext(view) }
+        view.setOnClickListener(callback)
+        Log.d(TAG, "Click listener ${callback.hashCode()} set on view ${view.id}")
+        emitter.setCancellable {
+            view.setOnClickListener(null)
+            Log.d(TAG, "Click listener ${callback.hashCode()} removed from view ${view.id}")
+        }
+    })
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater!!.inflate(R.layout.fragment_login, container, false)
-        mProgessBar = root.findViewById<ProgressBar>(R.id.progressBar)
-        mLoginButton = root.findViewById<AppCompatButton>(R.id.loginButton)
-        mUsername = root.findViewById<TextInputEditText>(R.id.username)
-        mPassword = root.findViewById<TextInputEditText>(R.id.password)
-
-        mLoginButton!!.setOnClickListener { mPresenter!!.login(mUsername!!.text.toString(), mPassword!!.text.toString()) }
+        val password = root.password
+        val username:TextInputEditText = root.username
+        val loginButton = root.loginButton
 
         mPresenter?.let { presenter ->
-            val userValidationResults = textChanges(mUsername!!).debounce(500, TimeUnit.MILLISECONDS).map(presenter::validateUserName)
-            val passwordValidationResults = textChanges(mPassword!!).debounce(500, TimeUnit.MILLISECONDS).map { presenter.validatePassword(it) }
-
-            mDisposable.addAll(
-                    userValidationResults.observeOn(AndroidSchedulers.mainThread()).subscribe(this::showUsernameResult),
-                    passwordValidationResults.observeOn(AndroidSchedulers.mainThread()).subscribe(this::showPasswordResult)
-            )
-
+            val loginSubscription =
+                    clicks(loginButton)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                presenter.login(username.text.toString(), password.text.toString())
+                            }
+            val usernameValidationSubscription =
+                    textChanges(username)
+                            .debounce(500, TimeUnit.MILLISECONDS)
+                            .map(presenter::validateUserName)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(this::showUsernameResult)
+            val passwordValidationSubscription =
+                    textChanges(password)
+                            .debounce(500, TimeUnit.MILLISECONDS)
+                            .map { presenter.validatePassword(it) }
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(this::showPasswordResult)
+            mDisposable.addAll(loginSubscription, usernameValidationSubscription, passwordValidationSubscription)
         }
         return root
-
     }
+
 
     override fun setPresenter(presenter: LoginContract.Presenter) {
         this.mPresenter = checkNotNull(presenter)
@@ -96,10 +109,10 @@ class LoginFragment : Fragment(), LoginContract.View {
         get() = isAdded
 
     override fun setLoadingIndicator(isActive: Boolean) {
-        mProgessBar!!.visibility = if (isActive) View.VISIBLE else View.GONE
+        view?.progressBar?.visibility = if (isActive) View.VISIBLE else View.GONE
     }
 
-    fun showTextViewValidationResult(view: EditText, result: ValidationResult) {
+    private fun showTextViewValidationResult(view: EditText, result: ValidationResult) {
         when (result) {
             is Ok -> view.error = null
             is Failed -> {
@@ -109,11 +122,11 @@ class LoginFragment : Fragment(), LoginContract.View {
     }
 
     override fun showUsernameResult(result: ValidationResult) {
-        showTextViewValidationResult(mUsername!!, result)
+        showTextViewValidationResult(view?.username!!, result)
     }
 
     override fun showPasswordResult(result: ValidationResult) {
-        showTextViewValidationResult(mPassword!!, result)
+        showTextViewValidationResult(view?.password!!, result)
     }
 
     override fun showRedditNews() {
