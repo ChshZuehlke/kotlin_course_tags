@@ -2,26 +2,21 @@ package ch.zuehlke.sbb.reddit.data.source.remote
 
 import android.content.Context
 import android.util.Log
-
-import com.google.common.base.Strings
-
-import java.io.IOException
-import java.util.ArrayList
-import java.util.Date
-
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIResponse
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
+import com.google.common.base.Preconditions.checkNotNull
+import com.google.common.base.Strings
+import com.google.gson.Gson
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
 import java.lang.reflect.Type
-
-import com.google.common.base.Preconditions.checkNotNull
-import com.google.gson.Gson
+import java.util.*
 
 /**
  * Created by chsc on 08.11.17.
@@ -48,17 +43,16 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
         val call = mRedditAPI.getSortedNews("hot", after, "10")
         call.enqueue(object : Callback<RedditNewsAPIResponse> {
             override fun onResponse(call: Call<RedditNewsAPIResponse>, response: Response<RedditNewsAPIResponse>) {
-                after = response.body().data!!.after!!
+                after = response.body()!!.data!!.after!!
                 Log.i(TAG, "Recieved reddit response: " + response.body())
                 val redditNewsDataList = ArrayList<RedditNewsData>()
-                for (child in response.body().data!!.children!!) {
+                for (child in response.body()!!.data!!.children!!) {
                     val data = child.data
                     Log.i(TAG, "child date: " + Date(data!!.created))
-                    data?.let {
+                    data.let {
                         redditNewsDataList.add(RedditNewsData(data.author!!, data.title!!, data.num_comments, data.created, data.thumbnail!!, data.url!!, data.id!!, data.permalink!!))
-
                     }
-                     }
+                }
                 callback.onNewsLoaded(redditNewsDataList)
             }
 
@@ -75,10 +69,10 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
         val call = mRedditAPI.getSortedNews("hot", "", "10")
         call.enqueue(object : Callback<RedditNewsAPIResponse> {
             override fun onResponse(call: Call<RedditNewsAPIResponse>, response: Response<RedditNewsAPIResponse>) {
-                after = response.body().data!!.after!!
+                after = response.body()!!.data!!.after!!
                 Log.i(TAG, "Recieved reddit response: " + response.body())
                 val redditNewsDataList = ArrayList<RedditNewsData>()
-                for (child in response.body().data!!.children!!) {
+                for (child in response.body()!!.data!!.children!!) {
                     val data = child.data
                     data?.let {
                         redditNewsDataList.add(RedditNewsData(data.author!!, data.title!!, data.num_comments, data.created, data.thumbnail!!, data.url!!, data.id!!, data.permalink!!))
@@ -102,7 +96,7 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 var redditPosts: List<RedditPostsData> = ArrayList()
                 val parentId: String? = null
-                val elements = parseResponseToPostElements(response.body())
+                val elements = parseResponseToPostElements(response.body()!!)
                 order = 0
                 redditPosts = flattenRetrofitResponse(elements, title)
                 callback.onPostsLoaded(redditPosts)
@@ -175,7 +169,7 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
         try {
             redditPostElements = mGson.fromJson<List<RedditPostElement>>(response.string(), mType)
         } catch (e: IOException) {
-           Log.e(TAG,"Error while parsing respone $e")
+            Log.e(TAG, "Error while parsing respone $e")
         }
 
         return redditPostElements!!

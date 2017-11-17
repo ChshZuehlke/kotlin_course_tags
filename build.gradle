@@ -2,6 +2,7 @@
 
 buildscript {
     ext.kotlin_version = '1.1.60'
+    ext.plugin_version = '3.0.0'
     repositories {
         google()
         jcenter()
@@ -30,6 +31,7 @@ ext{
     guavaVersion = '18.0'
     picasso_version = '2.5.2'
     retrofit_version = '2.0.0'
+    rx_kotlin = '2.1.0'
     kodein_version = '4.1.0'
     room_version = '1.0.0'
 }
