@@ -3,6 +3,7 @@ package ch.zuehlke.sbb.reddit.features.login
 import android.os.AsyncTask
 import android.os.Handler
 import com.google.common.base.Preconditions.checkNotNull
+import com.google.common.base.Strings
 
 /**
  * Created by chsc on 08.11.17.
@@ -10,12 +11,33 @@ import com.google.common.base.Preconditions.checkNotNull
 
 class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
 
-    private val mLoginView: LoginContract.View
+    private val mLoginView: LoginContract.View = checkNotNull(view, "LoginView cannot be null")
 
-
-    init {
-        this.mLoginView = checkNotNull(view, "LoginView cannot be null")
+    private fun verifyPasswordLength(password: String): Boolean {
+        return !Strings.isNullOrEmpty(password) && password.length >= 6
     }
+
+    private fun verifyIsEmail(email: String): Boolean {
+        val matcher = android.util.Patterns.EMAIL_ADDRESS.matcher(email)
+        return matcher.matches()
+    }
+
+    override fun validateUserName(userName: String): ValidationResult {
+        return if(verifyIsEmail(userName)) {
+            Ok
+        } else {
+            Failed("Username must be an email address")
+        }
+    }
+
+    override fun validatePassword(password: String): ValidationResult {
+        return if(verifyPasswordLength(password)) {
+            Ok
+        } else {
+            Failed("Password must be 6 or more long")
+        }
+    }
+
 
     override fun start() {
         // Do nothing here, as we don't load any redditPost
@@ -35,12 +57,12 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
 
                         var hasError = false
                         if (userEmail != "test.tester@test.com") {
-                            mLoginView.showInvalidUsername()
+                            mLoginView.showUsernameResult(Failed("Username must be a test email"))
                             hasError = true
                         }
 
                         if (password != "123456") {
-                            mLoginView.showInvalidPassword()
+                            mLoginView.showPasswordResult(Failed("Password must be very secure"))
                             hasError = true
                         }
 

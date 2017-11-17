@@ -4,13 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TextInputEditText
 import android.support.v4.app.Fragment
-import android.support.v7.widget.AppCompatButton
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.EditText
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.overview.OverviewActivity
 import com.github.salomonbrys.kodein.Kodein
@@ -18,6 +19,13 @@ import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.SupportFragmentInjector
 import com.github.salomonbrys.kodein.instance
 import com.google.common.base.Strings
+import com.google.common.base.Preconditions.checkNotNull
+import io.reactivex.Observable
+import io.reactivex.ObservableOnSubscribe
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.fragment_login.view.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by chsc on 08.11.17.
@@ -34,74 +42,81 @@ class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
     //injected
     private val mPresenter: LoginContract.Presenter by instance()
 
-    private var mProgessBar: ProgressBar? = null
-    private var mLoginButton: AppCompatButton? = null
-    private var mUsername: TextInputEditText? = null
-    private var mPassword: TextInputEditText? = null
+    private val mDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onResume() {
         super.onResume()
-        mPresenter!!.start()
+        mPresenter.start()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-
+    override fun onPause() {
+        super.onPause()
+        mDisposable.dispose()
     }
+
+    private fun textChanges(view: EditText) = Observable.create(ObservableOnSubscribe<String> { emitter ->
+        val callback: TextWatcher = object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                emitter.onNext(s.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        }
+        view.addTextChangedListener(callback)
+        Log.d(TAG, "Text changed listener ${callback.hashCode()} to view ${view.id} added")
+        emitter.setCancellable {
+            view.removeTextChangedListener(callback)
+            Log.d(TAG, "Text changed listener ${callback.hashCode()} from view ${view.id} removed")
+        }
+    })
+
+    private fun <T : View> clicks(view: T) = Observable.create(ObservableOnSubscribe<T> { emitter ->
+        val callback: View.OnClickListener = View.OnClickListener { emitter.onNext(view) }
+        view.setOnClickListener(callback)
+        Log.d(TAG, "Click listener ${callback.hashCode()} set on view ${view.id}")
+        emitter.setCancellable {
+            view.setOnClickListener(null)
+            Log.d(TAG, "Click listener ${callback.hashCode()} removed from view ${view.id}")
+        }
+    })
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         initializeInjector()
 
         val root = inflater!!.inflate(R.layout.fragment_login, container, false)
-        mProgessBar = root.findViewById<ProgressBar>(R.id.progressBar)
-        mLoginButton = root.findViewById<AppCompatButton>(R.id.loginButton)
-        mUsername = root.findViewById<TextInputEditText>(R.id.username)
-        mPassword = root.findViewById<TextInputEditText>(R.id.password)
+        val password = root.password
+        val username:TextInputEditText = root.username
+        val loginButton = root.loginButton
 
-        mLoginButton!!.setOnClickListener { mPresenter!!.login(mUsername!!.text.toString(), mPassword!!.text.toString()) }
-
-
-        mUsername!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                // Do nothing
-            }
-
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                // Do nothing
-            }
-
-            override fun afterTextChanged(editable: Editable) {
-                if (editable.length > 0 && verifyIsEmail(editable.toString())) {
-                    mUsername!!.error = null
-                } else {
-                    mUsername!!.error = getString(R.string.login_screen_invalid_email)
-                }
-            }
-        })
-
-        mPassword!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-            }
-
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-            }
-
-            override fun afterTextChanged(editable: Editable) {
-                if (verifyPasswordLength(editable.toString())) {
-                    mPassword!!.error = null
-                } else {
-                    mPassword!!.error = getString(R.string.login_screen_invalid_password_length)
-                }
-            }
-        })
-
+        mPresenter?.let { presenter ->
+            val loginSubscription =
+                    clicks(loginButton)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                presenter.login(username.text.toString(), password.text.toString())
+                            }
+            val usernameValidationSubscription =
+                    textChanges(username)
+                            .debounce(500, TimeUnit.MILLISECONDS)
+                            .map(presenter::validateUserName)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(this::showUsernameResult)
+            val passwordValidationSubscription =
+                    textChanges(password)
+                            .debounce(500, TimeUnit.MILLISECONDS)
+                            .map { presenter.validatePassword(it) }
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(this::showPasswordResult)
+            mDisposable.addAll(loginSubscription, usernameValidationSubscription, passwordValidationSubscription)
+        }
         return root
-
     }
+
 
     //TODO use with kodein
     override fun setPresenter(presenter: LoginContract.Presenter) {
@@ -112,17 +127,25 @@ class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
         get() = isAdded
 
     override fun setLoadingIndicator(isActive: Boolean) {
-        mProgessBar!!.visibility = if (isActive) View.VISIBLE else View.GONE
+        view?.progressBar?.visibility = if (isActive) View.VISIBLE else View.GONE
     }
 
-    override fun showInvalidUsername() {
-        mUsername!!.error = getString(R.string.login_screen_invalid_username)
+    private fun showTextViewValidationResult(view: EditText, result: ValidationResult) {
+        when (result) {
+            is Ok -> view.error = null
+            is Failed -> {
+                view.error = result.message
+            }
+        }
     }
 
-    override fun showInvalidPassword() {
-        mPassword!!.error = getString(R.string.login_screen_invalid_password)
+    override fun showUsernameResult(result: ValidationResult) {
+        showTextViewValidationResult(view?.username!!, result)
     }
 
+    override fun showPasswordResult(result: ValidationResult) {
+        showTextViewValidationResult(view?.password!!, result)
+    }
 
     override fun showRedditNews() {
         val intent = Intent(context, OverviewActivity::class.java)
@@ -131,21 +154,13 @@ class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
     }
 
 
-    private fun verifyPasswordLength(password: String): Boolean {
-        return !Strings.isNullOrEmpty(password) && password.length >= 6
-    }
-
-    private fun verifyIsEmail(email: String): Boolean {
-        val matcher = android.util.Patterns.EMAIL_ADDRESS.matcher(email)
-        return matcher.matches()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         destroyInjector()
     }
 
     companion object {
+        private const val TAG = "LoginFragment"
 
         fun newInstance(): LoginFragment {
             return LoginFragment()
