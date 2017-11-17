@@ -29,6 +29,3 @@ interface LoginContract {
     }
 }
 
-sealed class ValidationResult
-object Ok : ValidationResult()
-data class Failed(val message: String) : ValidationResult()

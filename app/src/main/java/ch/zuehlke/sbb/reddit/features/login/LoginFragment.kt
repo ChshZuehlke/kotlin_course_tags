@@ -10,16 +10,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import android.widget.EditText
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.overview.OverviewActivity
-import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.SupportFragmentInjector
 import com.github.salomonbrys.kodein.instance
-import com.google.common.base.Strings
-import com.google.common.base.Preconditions.checkNotNull
+import com.github.salomonbrys.kodein.with
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -35,12 +32,10 @@ class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
 
     override val injector: KodeinInjector = KodeinInjector()
 
-    override fun provideOverridingModule() = Kodein.Module {
-        import(createLoginModule(this@LoginFragment))
-    }
+    override fun provideOverridingModule() = createLoginModule(this@LoginFragment)
 
     //injected
-    private val mPresenter: LoginContract.Presenter by instance()
+    private val mPresenter: LoginContract.Presenter by injector.with(this@LoginFragment).instance()
 
     private val mDisposable: CompositeDisposable = CompositeDisposable()
 

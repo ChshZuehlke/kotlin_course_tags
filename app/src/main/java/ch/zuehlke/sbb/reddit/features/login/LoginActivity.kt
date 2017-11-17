@@ -6,7 +6,7 @@ import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.util.ActivityUtils
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
-import com.github.salomonbrys.kodein.android.AppCompatActivityInjector
+import com.github.salomonbrys.kodein.android.FragmentActivityInjector
 import com.github.salomonbrys.kodein.bind
 import com.github.salomonbrys.kodein.instance
 
@@ -14,7 +14,7 @@ import com.github.salomonbrys.kodein.instance
  * Created by chsc on 08.11.17.
  */
 
-class LoginActivity : AppCompatActivity(), AppCompatActivityInjector{
+class LoginActivity : AppCompatActivity(), FragmentActivityInjector {
 
     override val injector: KodeinInjector = KodeinInjector()
 
