@@ -19,10 +19,6 @@ class RedditNewsLocalDataSource constructor(context: Context) : RedditDataSource
         return Observable.empty<List<RedditPostsData>>()
     }
 
-    override fun getPosts(callback: RedditDataSource.LoadPostsCallback, title: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun savePosts(data: RedditPostsData) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

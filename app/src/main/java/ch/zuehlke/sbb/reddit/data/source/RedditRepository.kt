@@ -28,10 +28,6 @@ class RedditRepository (val newsRemoteDataSource: RedditDataSource, val newsLoca
         return Observable.merge(sources.map{it.posts(convertedPermalink)}, 1, 1)
     }
 
-    override fun getPosts(callback: RedditDataSource.LoadPostsCallback, title: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun savePosts(data: RedditPostsData) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

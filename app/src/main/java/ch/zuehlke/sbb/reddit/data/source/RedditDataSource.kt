@@ -15,16 +15,6 @@ interface RedditDataSource {
 
     fun posts(title: String): Observable<List<RedditPostsData>>
 
-    interface LoadPostsCallback {
-
-        fun onPostsLoaded(posts: List<RedditPostsData>)
-
-        fun onDataNotAvailable()
-    }
-
-
-    fun getPosts(callback: LoadPostsCallback, title: String)
-
     fun savePosts(data: RedditPostsData)
 
     fun deletePostsWithPermaLink(permaLink: String)

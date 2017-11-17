@@ -81,10 +81,6 @@ class RedditNewsDataRemoteDataSource constructor(val context: Context, val reddi
                 }.toObservable()
     }
 
-    override fun getPosts(callback: RedditDataSource.LoadPostsCallback, title: String) {
-
-    }
-
     override fun savePosts(data: RedditPostsData) {
         //Remotly its not used
     }
