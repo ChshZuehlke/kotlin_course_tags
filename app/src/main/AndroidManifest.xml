@@ -21,8 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".features.overview.OverviewActivity"></activity>
-        <activity android:name=".features.detail.DetailActivity"></activity>
+
+        <activity android:name=".features.news.NewsActivity"></activity>
 
     </application>
 

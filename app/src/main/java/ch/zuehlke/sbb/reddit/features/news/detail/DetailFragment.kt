@@ -1,8 +1,7 @@
-package ch.zuehlke.sbb.reddit.features.detail
+package ch.zuehlke.sbb.reddit.features.news.detail
 
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
@@ -11,33 +10,27 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
-import ch.zuehlke.sbb.reddit.features.overview.InfiniteScrollListener
-import ch.zuehlke.sbb.reddit.features.overview.ScrollChildSwipeRefreshLayout
+import ch.zuehlke.sbb.reddit.features.BaseFragment
+import ch.zuehlke.sbb.reddit.features.news.overview.ScrollChildSwipeRefreshLayout
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
-
-import com.google.common.base.Preconditions.checkNotNull
+import com.github.salomonbrys.kodein.instance
+import com.github.salomonbrys.kodein.with
 
 
 /**
  * Created by chsc on 13.11.17.
  */
 
-class DetailFragment : Fragment(), DetailContract.View {
+class DetailFragment: BaseFragment(), DetailContract.View {
 
-    private var mPresenter: DetailContract.Presenter? = null
-    private var mAdapter: DetailAdapter? = null
+    override fun provideOverridingModule() = createNewsDetailsModule(this@DetailFragment,EXTRA_REDDIT_NEWS_URL)
+    //injected
+    private val mPresenter: DetailContract.Presenter by injector.with(this@DetailFragment).instance()
+    private val mAdapter: DetailAdapter by injector.with(this@DetailFragment).instance()
+
     private var mPostView: RecyclerView? = null
     private var mNoPostView: View? = null
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mAdapter = DetailAdapter(context)
-    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater!!.inflate(R.layout.fragment_detail, container, false)
@@ -55,9 +48,8 @@ class DetailFragment : Fragment(), DetailContract.View {
                 ContextCompat.getColor(activity, R.color.colorPrimaryDark)
         )
 
-
         swipeRefreshLayout.setScrollUpChild(mPostView!!)
-        swipeRefreshLayout.setOnRefreshListener { mPresenter!!.loadRedditPosts() }
+        swipeRefreshLayout.setOnRefreshListener { mPresenter.loadRedditPosts() }
 
 
         mPostView!!.setHasFixedSize(true)
@@ -67,11 +59,7 @@ class DetailFragment : Fragment(), DetailContract.View {
 
     override fun onResume() {
         super.onResume()
-        mPresenter!!.start()
-    }
-
-    override fun setPresenter(presenter: DetailContract.Presenter) {
-        mPresenter = checkNotNull(presenter)
+        mPresenter.start()
     }
 
     override val isActive: Boolean
@@ -79,7 +67,7 @@ class DetailFragment : Fragment(), DetailContract.View {
 
     override fun showRedditPosts(posts: List<RedditPostsData>) {
         Log.i(TAG, "Got " + posts.size + " posts")
-        mAdapter!!.clearAndAddPosts(posts)
+        mAdapter.clearAndAddPosts(posts)
     }
 
     override fun showRedditNewsLoadingError() {
@@ -98,9 +86,14 @@ class DetailFragment : Fragment(), DetailContract.View {
     companion object {
 
         private val TAG = "DetailFragment"
+        val EXTRA_REDDIT_NEWS_URL = "redditNewsUrl"
 
-        fun newInstance(): DetailFragment {
-            return DetailFragment()
+        fun newInstance(redditUrl: String): DetailFragment {
+            val detailFragment = DetailFragment()
+            val args = Bundle()
+            args.putString(EXTRA_REDDIT_NEWS_URL, redditUrl)
+            detailFragment.setArguments(args)
+            return detailFragment
         }
     }
-}// Requires empty public constructor
+}
