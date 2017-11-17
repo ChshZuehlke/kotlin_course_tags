@@ -3,7 +3,6 @@ package ch.zuehlke.sbb.reddit.features.login
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TextInputEditText
-import android.support.v4.app.Fragment
 import android.support.v7.widget.AppCompatButton
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,28 +11,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.features.overview.OverviewActivity
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.KodeinInjector
-import com.github.salomonbrys.kodein.android.SupportFragmentInjector
+import ch.zuehlke.sbb.reddit.features.BaseFragment
+import ch.zuehlke.sbb.reddit.features.news.NewsActivity
 import com.github.salomonbrys.kodein.instance
-import com.google.common.base.Preconditions.checkNotNull
+import com.github.salomonbrys.kodein.with
 import com.google.common.base.Strings
 
 /**
  * Created by chsc on 08.11.17.
  */
 
-class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
+class LoginFragment : BaseFragment(), LoginContract.View {
 
-    override val injector: KodeinInjector = KodeinInjector()
 
-    override fun provideOverridingModule() = Kodein.Module {
-        import(createLoginModule(this@LoginFragment))
-    }
-
+    override fun provideOverridingModule() = createLoginModule(this@LoginFragment)
     //injected
-    private val mPresenter: LoginContract.Presenter by instance()
+    private val mPresenter: LoginContract.Presenter by injector.with(this@LoginFragment).instance()
+
 
     private var mProgessBar: ProgressBar? = null
     private var mLoginButton: AppCompatButton? = null
@@ -42,18 +36,12 @@ class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
 
     override fun onResume() {
         super.onResume()
-        mPresenter!!.start()
+        mPresenter.start()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-
-    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        initializeInjector()
+        super.onCreateView(inflater, container, savedInstanceState)
 
         val root = inflater!!.inflate(R.layout.fragment_login, container, false)
         mProgessBar = root.findViewById<ProgressBar>(R.id.progressBar)
@@ -61,7 +49,7 @@ class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
         mUsername = root.findViewById<TextInputEditText>(R.id.username)
         mPassword = root.findViewById<TextInputEditText>(R.id.password)
 
-        mLoginButton!!.setOnClickListener { mPresenter!!.login(mUsername!!.text.toString(), mPassword!!.text.toString()) }
+        mLoginButton!!.setOnClickListener { mPresenter.login(mUsername!!.text.toString(), mPassword!!.text.toString()) }
 
 
         mUsername!!.addTextChangedListener(object : TextWatcher {
@@ -104,11 +92,6 @@ class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
 
     }
 
-    //TODO use with kodein
-    override fun setPresenter(presenter: LoginContract.Presenter) {
-        //do nothing- presenter is already injected
-    }
-
     override val isActive: Boolean
         get() = isAdded
 
@@ -126,7 +109,7 @@ class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
 
 
     override fun showRedditNews() {
-        val intent = Intent(context, OverviewActivity::class.java)
+        val intent = Intent(context, NewsActivity::class.java)
         startActivity(intent)
         activity.finish()
     }
@@ -141,10 +124,7 @@ class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
         return matcher.matches()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        destroyInjector()
-    }
+
 
     companion object {
 

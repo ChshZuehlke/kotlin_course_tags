@@ -1,4 +1,4 @@
-package ch.zuehlke.sbb.reddit.features.overview.adapter.impl
+package ch.zuehlke.sbb.reddit.features.news.overview.adapter.impl
 
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import java.util.ArrayList
 import java.util.HashMap
 
-import ch.zuehlke.sbb.reddit.features.overview.adapter.AdapterConstants
-import ch.zuehlke.sbb.reddit.features.overview.adapter.ViewType
-import ch.zuehlke.sbb.reddit.features.overview.adapter.ViewTypeDelegateAdapter
+import ch.zuehlke.sbb.reddit.features.news.overview.adapter.AdapterConstants
+import ch.zuehlke.sbb.reddit.features.news.overview.adapter.ViewType
+import ch.zuehlke.sbb.reddit.features.news.overview.adapter.ViewTypeDelegateAdapter
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 
 /**

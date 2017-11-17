@@ -1,4 +1,4 @@
-package ch.zuehlke.sbb.reddit.features.overview.adapter
+package ch.zuehlke.sbb.reddit.features.news.overview.adapter
 
 /**
  * Created by chsc on 12.11.17.

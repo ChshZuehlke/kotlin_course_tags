@@ -101,7 +101,6 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 var redditPosts: List<RedditPostsData> = ArrayList()
-                val parentId: String? = null
                 val elements = parseResponseToPostElements(response.body())
                 order = 0
                 redditPosts = flattenRetrofitResponse(elements, title)
