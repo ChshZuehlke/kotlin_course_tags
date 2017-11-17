@@ -1,13 +1,12 @@
 package ch.zuehlke.sbb.reddit.features.overview
 
 import android.os.Bundle
-import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 
 import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.util.ActivityUtils
+import ch.zuehlke.sbb.reddit.extensions.addFragment
 
 /**
  * Created by chsc on 11.11.17.
@@ -32,8 +31,7 @@ class OverviewActivity : AppCompatActivity() {
         if (overviewFragment == null) {
             // Create the fragment
             overviewFragment = OverviewFragment.newInstance()
-            ActivityUtils.addFragmentToActivity(
-                    supportFragmentManager, overviewFragment!!, R.id.contentFrame)
+            addFragment(overviewFragment!!, R.id.contentFrame)
         }
 
         // Create the presenter

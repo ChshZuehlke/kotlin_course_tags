@@ -1,14 +1,13 @@
 package ch.zuehlke.sbb.reddit.features.detail
 
 import android.os.Bundle
-import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
 
 import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.util.ActivityUtils
+import ch.zuehlke.sbb.reddit.extensions.addFragment
 
 /**
  * Created by chsc on 11.11.17.
@@ -34,8 +33,7 @@ class DetailActivity : AppCompatActivity() {
         if (detailFragment == null) {
             // Create the fragment
             detailFragment = DetailFragment.newInstance()
-            ActivityUtils.addFragmentToActivity(
-                    supportFragmentManager, detailFragment!!, R.id.contentFrame)
+            addFragment( detailFragment, R.id.contentFrame)
         }
 
         // Create the presenter

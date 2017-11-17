@@ -1,12 +1,10 @@
 package ch.zuehlke.sbb.reddit.features.login
 
 import android.os.Bundle
-import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.util.ActivityUtils
+import ch.zuehlke.sbb.reddit.extensions.addFragment
 
 /**
  * Created by chsc on 08.11.17.
@@ -26,8 +24,7 @@ class LoginActivity : AppCompatActivity() {
         if (loginFragment == null) {
             // Create the fragment
             loginFragment = LoginFragment.newInstance()
-            ActivityUtils.addFragmentToActivity(
-                    supportFragmentManager, loginFragment!!, R.id.contentFrame)
+            addFragment(loginFragment!!, R.id.contentFrame)
         }
 
         // Create the presenter

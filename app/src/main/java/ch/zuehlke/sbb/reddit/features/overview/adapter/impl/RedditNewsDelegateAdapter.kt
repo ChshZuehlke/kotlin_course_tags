@@ -3,7 +3,6 @@ package ch.zuehlke.sbb.reddit.features.overview.adapter.impl
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,7 +14,7 @@ import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.overview.adapter.ViewType
 import ch.zuehlke.sbb.reddit.features.overview.adapter.ViewTypeDelegateAdapter
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
-import ch.zuehlke.sbb.reddit.util.DateUtils
+import ch.zuehlke.sbb.reddit.extensions.friendlyTime
 
 /**
  * Created by chsc on 12.11.17.
@@ -50,7 +49,7 @@ class RedditNewsDelegateAdapter(private val mListener: RedditNewsDelegateAdapter
             mComments.text = data.numberOfComments.toString()
             mAuthor.text = data.author
             mTitle.text = data.title
-            mTime.text = DateUtils.friendlyTime(data.created)
+            mTime.text = data.created.friendlyTime()
             if (Strings.isNullOrEmpty(data.thumbnailUrl)) {
                 Picasso.with(mContext).load(R.drawable.reddit_placeholder).into(mThumbnail)
             } else {

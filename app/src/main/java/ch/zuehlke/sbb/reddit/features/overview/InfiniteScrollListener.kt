@@ -4,6 +4,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.OnScrollListener
 import android.util.Log
+import ch.zuehlke.sbb.reddit.extensions.logI
 
 /**
  * Created by chsc on 12.11.17.
@@ -31,7 +32,7 @@ abstract class InfiniteScrollListener(private val mLayoutManager: LinearLayoutMa
                 }
             }
             if (!loading && totalItemCount - visibleItemCount >= firstVisibleItem + visibleThreshold) {
-                Log.i(TAG, "End reached")
+               logI("End reached")
             }
             if (!loading) {
                 loadingFunction()
