@@ -85,35 +85,32 @@ class LoginFragment : Fragment(), LoginContract.View, SupportFragmentInjector {
 
         val root = inflater!!.inflate(R.layout.fragment_login, container, false)
         val password = root.password
-        val username:TextInputEditText = root.username
+        val username: TextInputEditText = root.username
         val loginButton = root.loginButton
 
-        mPresenter?.let { presenter ->
-            val loginSubscription =
-                    clicks(loginButton)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                presenter.login(username.text.toString(), password.text.toString())
-                            }
-            val usernameValidationSubscription =
-                    textChanges(username)
-                            .debounce(500, TimeUnit.MILLISECONDS)
-                            .map(presenter::validateUserName)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(this::showUsernameResult)
-            val passwordValidationSubscription =
-                    textChanges(password)
-                            .debounce(500, TimeUnit.MILLISECONDS)
-                            .map { presenter.validatePassword(it) }
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(this::showPasswordResult)
-            mDisposable.addAll(loginSubscription, usernameValidationSubscription, passwordValidationSubscription)
-        }
+        val loginSubscription =
+                clicks(loginButton)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            mPresenter.login(username.text.toString(), password.text.toString())
+                        }
+        val usernameValidationSubscription =
+                textChanges(username)
+                        .debounce(500, TimeUnit.MILLISECONDS)
+                        .map(mPresenter::validateUserName)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(this::showUsernameResult)
+        val passwordValidationSubscription =
+                textChanges(password)
+                        .debounce(500, TimeUnit.MILLISECONDS)
+                        .map { mPresenter.validatePassword(it) }
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(this::showPasswordResult)
+        mDisposable.addAll(loginSubscription, usernameValidationSubscription, passwordValidationSubscription)
+
         return root
     }
 
-
-    //TODO use with kodein
     override fun setPresenter(presenter: LoginContract.Presenter) {
         //do nothing- presenter is already injected
     }

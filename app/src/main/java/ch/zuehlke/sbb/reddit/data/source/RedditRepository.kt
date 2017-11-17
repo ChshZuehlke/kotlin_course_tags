@@ -15,7 +15,7 @@ class RedditRepository (val newsRemoteDataSource: RedditDataSource, val newsLoca
     private val sources = listOf(newsLocalDataSource, newsRemoteDataSource)
 
     override val news: Flowable<List<RedditNewsData>>
-        get() = Flowable.merge(sources.map{it.news}, 1, 1).filter{ it.isNotEmpty() }
+        get() = Flowable.concat(sources.map{it.news}).filter{ it.isNotEmpty() }.replay().autoConnect()
 
     private fun convertURLToRemote(url: String): String {
         val parsedUrl = url.substring(url.indexOf(COMMENT_SECION) + COMMENT_SECION.length)

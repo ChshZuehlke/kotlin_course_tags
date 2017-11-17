@@ -53,6 +53,7 @@ class DetailPresenter(detailView: DetailContract.View, repository: RedditReposit
                             }
                         },
                         onNext = { posts ->
+                            Log.d(TAG, "Updating the content of the posts")
                             with(mDetailView) {
                                 setLoadingIndicator(false)
                                 showRedditPosts(posts)
