@@ -7,20 +7,20 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.AppCompatButton
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ProgressBar
-
-import com.google.common.base.Strings
-
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.overview.OverviewActivity
-
 import com.google.common.base.Preconditions.checkNotNull
+import io.reactivex.Observable
+import io.reactivex.ObservableOnSubscribe
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by chsc on 08.11.17.
@@ -33,11 +33,37 @@ class LoginFragment : Fragment(), LoginContract.View {
     private var mLoginButton: AppCompatButton? = null
     private var mUsername: TextInputEditText? = null
     private var mPassword: TextInputEditText? = null
+    private val mDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onResume() {
         super.onResume()
         mPresenter!!.start()
     }
+
+    override fun onPause() {
+        super.onPause()
+        mDisposable.dispose()
+    }
+
+    private fun textChanges(view: EditText) = Observable.create(ObservableOnSubscribe<String> { e ->
+        val callback: TextWatcher = object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                e.onNext(s.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        }
+        view.addTextChangedListener(callback)
+        Log.d(TAG, "Text changed listener ${callback.hashCode()} to view ${view.id} added")
+        e.setCancellable {
+            view.removeTextChangedListener(callback)
+            Log.d(TAG, "Text changed listener ${callback.hashCode()} from view ${view.id} removed")
+        }
+    })
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater!!.inflate(R.layout.fragment_login, container, false)
@@ -48,45 +74,16 @@ class LoginFragment : Fragment(), LoginContract.View {
 
         mLoginButton!!.setOnClickListener { mPresenter!!.login(mUsername!!.text.toString(), mPassword!!.text.toString()) }
 
+        mPresenter?.let { presenter ->
+            val userValidationResults = textChanges(mUsername!!).debounce(500, TimeUnit.MILLISECONDS).map(presenter::validateUserName)
+            val passwordValidationResults = textChanges(mPassword!!).debounce(500, TimeUnit.MILLISECONDS).map { presenter.validatePassword(it) }
 
-        mUsername!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                // Do nothing
-            }
+            mDisposable.addAll(
+                    userValidationResults.observeOn(AndroidSchedulers.mainThread()).subscribe(this::showUsernameResult),
+                    passwordValidationResults.observeOn(AndroidSchedulers.mainThread()).subscribe(this::showPasswordResult)
+            )
 
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                // Do nothing
-            }
-
-            override fun afterTextChanged(editable: Editable) {
-                if (editable.length > 0 && verifyIsEmail(editable.toString())) {
-                    mUsername!!.error = null
-                } else {
-                    mUsername!!.error = getString(R.string.login_screen_invalid_email)
-                }
-            }
-        })
-
-        mPassword!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-            }
-
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-            }
-
-            override fun afterTextChanged(editable: Editable) {
-                if (verifyPasswordLength(editable.toString())) {
-                    mPassword!!.error = null
-                } else {
-                    mPassword!!.error = getString(R.string.login_screen_invalid_password_length)
-                }
-            }
-        })
-
-
-
+        }
         return root
 
     }
@@ -102,14 +99,22 @@ class LoginFragment : Fragment(), LoginContract.View {
         mProgessBar!!.visibility = if (isActive) View.VISIBLE else View.GONE
     }
 
-    override fun showInvalidUsername() {
-        mUsername!!.error = getString(R.string.login_screen_invalid_username)
+    fun showTextViewValidationResult(view: EditText, result: ValidationResult) {
+        when (result) {
+            is Ok -> view.error = null
+            is Failed -> {
+                view.error = result.message
+            }
+        }
     }
 
-    override fun showInvalidPassword() {
-        mPassword!!.error = getString(R.string.login_screen_invalid_password)
+    override fun showUsernameResult(result: ValidationResult) {
+        showTextViewValidationResult(mUsername!!, result)
     }
 
+    override fun showPasswordResult(result: ValidationResult) {
+        showTextViewValidationResult(mPassword!!, result)
+    }
 
     override fun showRedditNews() {
         val intent = Intent(context, OverviewActivity::class.java)
@@ -118,18 +123,8 @@ class LoginFragment : Fragment(), LoginContract.View {
     }
 
 
-    private fun verifyPasswordLength(password: String): Boolean {
-        return !Strings.isNullOrEmpty(password) && password.length >= 6
-    }
-
-    private fun verifyIsEmail(email: String): Boolean {
-        val matcher = android.util.Patterns.EMAIL_ADDRESS.matcher(email)
-        return matcher.matches()
-    }
-
     companion object {
-
-        private val EMAIL_PATTERN = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
+        private const val TAG = "LoginFragment"
 
         fun newInstance(): LoginFragment {
             return LoginFragment()

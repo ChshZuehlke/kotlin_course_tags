@@ -13,9 +13,8 @@ interface LoginContract {
 
         fun setLoadingIndicator(isActive: Boolean)
 
-        fun showInvalidUsername()
-
-        fun showInvalidPassword()
+        fun showUsernameResult(result: ValidationResult)
+        fun showPasswordResult(result: ValidationResult)
 
         fun showRedditNews()
     }
@@ -23,5 +22,13 @@ interface LoginContract {
     interface Presenter : BasePresenter {
 
         fun login(userEmail: String, password: String)
+
+        fun validateUserName(userName: String): ValidationResult
+
+        fun validatePassword(password: String): ValidationResult
     }
 }
+
+sealed class ValidationResult
+object Ok : ValidationResult()
+data class Failed(val message: String) : ValidationResult()
