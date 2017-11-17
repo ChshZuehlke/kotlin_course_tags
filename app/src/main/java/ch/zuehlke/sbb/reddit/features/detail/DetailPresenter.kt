@@ -15,13 +15,11 @@ import io.reactivex.schedulers.Schedulers
 class DetailPresenter(detailView: DetailContract.View, repository: RedditRepository, redditUrl: String) : DetailContract.Presenter {
 
     private val mRedditUrl: String
-    private val mDetailView: DetailContract.View
-    private val mRepository: RedditRepository
+    private val mDetailView: DetailContract.View = checkNotNull(detailView, "The DetailView cannot be null")
+    private val mRepository: RedditRepository = checkNotNull(repository, "The repository cannot be null")
     private val mDisposables = CompositeDisposable()
 
     init {
-        mRepository = checkNotNull(repository, "The repository cannot be null")
-        mDetailView = checkNotNull(detailView, "The DetailView cannot be null")
         checkNotNull(redditUrl, "The reddit url cannot be null")
         mRedditUrl = checkNotNull(redditUrl, "The reddit url cannot be null")
         detailView.setPresenter(this)

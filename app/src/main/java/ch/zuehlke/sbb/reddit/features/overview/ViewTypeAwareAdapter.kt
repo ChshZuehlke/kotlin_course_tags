@@ -35,7 +35,6 @@ class ViewTypeAwareAdapter(clickListener: GenericBindingViewHolder.GenericBindin
     }
 
     fun clearAndAddNews(newsData: List<RedditNewsData>) {
-
         val previousItemSize = items.size
         items.clear()
         notifyItemRangeRemoved(0, previousItemSize)
@@ -46,7 +45,9 @@ class ViewTypeAwareAdapter(clickListener: GenericBindingViewHolder.GenericBindin
     }
 
     private val loadingItem = object : ViewType {
-        override val viewType = AdapterConstants.LOADING
+        override fun getViewType(): Int {
+            return AdapterConstants.LOADING
+        }
     }
 
     override fun getObjForPosition(position: Int): Any {
@@ -54,7 +55,7 @@ class ViewTypeAwareAdapter(clickListener: GenericBindingViewHolder.GenericBindin
     }
 
     override fun getViewTypeForPosition(position: Int): Int {
-       return items[position].viewType
+       return items[position].getViewType()
     }
 
     override fun getLayoutIdForViewType(position: Int): Int {

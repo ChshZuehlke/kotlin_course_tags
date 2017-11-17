@@ -14,7 +14,9 @@ import ch.zuehlke.sbb.reddit.models.RedditPostsData
 class PostAdapter(clickListener: GenericBindingViewHolder.GenericBindingClickListener) : GenericBindingBaseAdapter(clickListener){
 
     private val POST_VIEW_TYPE = object : ViewType{
-        override val viewType = AdapterConstants.POST
+        override fun getViewType(): Int {
+            return AdapterConstants.POST
+        }
     }
 
     private val items = mutableListOf<RedditPostsData>()
@@ -33,11 +35,11 @@ class PostAdapter(clickListener: GenericBindingViewHolder.GenericBindingClickLis
     }
 
     override fun getLayoutIdForViewType(position: Int): Int {
-        return R.layout.item_detail;
+        return R.layout.item_detail
     }
 
     override fun getViewTypeForPosition(position: Int): Int {
-       return POST_VIEW_TYPE.viewType;
+       return POST_VIEW_TYPE.getViewType()
     }
 
     override fun getItemCount() = items.size

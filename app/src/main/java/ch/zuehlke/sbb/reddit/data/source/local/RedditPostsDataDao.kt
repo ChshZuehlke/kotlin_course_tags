@@ -13,16 +13,16 @@ import io.reactivex.Flowable
 @Dao
 interface RedditPostsDataDao{
 
-    @Query("select * from redditPosts where parentPermaLink = :arg0 order by ordering")
+    @Query("select * from redditPosts where parentPermaLink = :permalink order by ordering")
     fun getPosts(permalink: String?): List<RedditPostsData>
 
-    @Query("select * from redditPosts where parentPermaLink = :arg0 order by ordering")
+    @Query("select * from redditPosts where parentPermaLink = :permalink order by ordering")
     fun getPostsFlowable(permalink: String?): Flowable<List<RedditPostsData>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addPostItems(item: List<RedditPostsData>)
 
-    @Query("delete from redditPosts where parentPermaLink = :arg0")
+    @Query("delete from redditPosts where parentPermaLink = :permalink")
     fun deletePosts(permalink: String?)
 
 }

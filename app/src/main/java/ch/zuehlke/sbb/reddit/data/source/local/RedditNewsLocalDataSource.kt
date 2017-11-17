@@ -6,6 +6,7 @@ import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import com.google.common.base.Preconditions.checkNotNull
 import de.dabotz.shoppinglist.database.AppDatabase
+import io.reactivex.Observable
 
 /**
  * Created by chsc on 08.11.17.
@@ -17,35 +18,13 @@ class RedditNewsLocalDataSource constructor(context: Context, db: AppDatabase) :
 
     init {
         checkNotNull(context)
+        checkNotNull(db)
         mDb = db
     }
 
-    override fun getMoreNews(callback: RedditDataSource.LoadNewsCallback) {
-        throw UnsupportedOperationException("Not supported by local datasource")
-    }
+    override val news = mDb.redditNewsDataDao().getNewsSingle().toFlowable()
 
-    override fun getNews(callback: RedditDataSource.LoadNewsCallback) {
-        val redditNews = mDb.redditNewsDataDao().getNews();
-
-
-        if (redditNews.isEmpty()) {
-            // This will be called if the table is new or just empty.
-            callback.onDataNotAvailable()
-        } else {
-            callback.onNewsLoaded(redditNews)
-        }
-    }
-
-    override fun getPosts(callback: RedditDataSource.LoadPostsCallback, permalink: String) {
-
-        val redditNews = mDb.reditPostsDataDao().getPosts(permalink)
-        if (redditNews.isEmpty()) {
-            // This will be called if the table is new or just empty.
-            callback.onDataNotAvailable()
-        } else {
-            callback.onPostsLoaded(redditNews)
-        }
-    }
+    override fun posts(permalink: String): Observable<List<RedditPostsData>> = mDb.reditPostsDataDao().getPostsFlowable(permalink).toObservable()
 
     override fun savePosts(data: List<RedditPostsData>) {
 
@@ -71,18 +50,5 @@ class RedditNewsLocalDataSource constructor(context: Context, db: AppDatabase) :
     override fun saveRedditNews(data: List<RedditNewsData>) {
         checkNotNull(data)
         mDb.redditNewsDataDao().addNewsItem(data)
-    }
-    */
-
-    companion object {
-
-        private var INSTANCE: RedditNewsLocalDataSource? = null
-
-        fun getInstance(context: Context): RedditNewsLocalDataSource {
-            if (INSTANCE == null) {
-                INSTANCE = RedditNewsLocalDataSource(context)
-            }
-            return INSTANCE!!
-        }
     }
 }

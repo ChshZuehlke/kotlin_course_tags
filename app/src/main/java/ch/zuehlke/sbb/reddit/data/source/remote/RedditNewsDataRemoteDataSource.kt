@@ -61,7 +61,7 @@ class RedditNewsDataRemoteDataSource constructor(val context: Context, val reddi
         return newsSource.map { response ->
             val news = response.data?.children?.map { child ->
                 child.data?.let { d ->
-                    RedditNewsData(d.author, d.title, d.num_comments, d.created, d.thumbnail, d.url, d.id, d.permalink)
+                    RedditNewsData(d.author, d.title, d.num_comments, d.created, d.thumbnail, d.url, d.id!!, d.permalink!!)
                 }
             } ?: emptyList()
             Pair(news, response.data?.after)
