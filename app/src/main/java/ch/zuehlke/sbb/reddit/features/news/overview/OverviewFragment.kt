@@ -1,9 +1,7 @@
-package ch.zuehlke.sbb.reddit.features.overview
+package ch.zuehlke.sbb.reddit.features.news.overview
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
@@ -11,24 +9,28 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.features.detail.DetailActivity
-import ch.zuehlke.sbb.reddit.features.overview.adapter.impl.RedditNewsDelegateAdapter
-import ch.zuehlke.sbb.reddit.features.overview.adapter.impl.RedditNewsDelegateAdapter.OnNewsSelectedListener
-import ch.zuehlke.sbb.reddit.features.overview.adapter.impl.RedditOverviewAdapter
+import ch.zuehlke.sbb.reddit.features.BaseFragment
+import ch.zuehlke.sbb.reddit.features.news.NavigationController
+import ch.zuehlke.sbb.reddit.features.news.overview.adapter.impl.RedditNewsDelegateAdapter.OnNewsSelectedListener
+import ch.zuehlke.sbb.reddit.features.news.overview.adapter.impl.RedditOverviewAdapter
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
-
-import com.google.common.base.Preconditions.checkNotNull
+import com.github.salomonbrys.kodein.instance
+import com.github.salomonbrys.kodein.with
 
 /**
  * Created by chsc on 11.11.17.
  */
 
-class OverviewFragment : Fragment(), OverviewContract.View {
+class OverviewFragment : BaseFragment(), OverviewContract.View {
 
-    private var mOverviewPresenter: OverviewContract.Presenter? = null
-    private var mOverviewAdapter: RedditOverviewAdapter? = null
+    override fun provideOverridingModule() = createNewsOverviewModule(this@OverviewFragment,listener)
+
+    //Injections
+    private val mOverviewPresenter: OverviewContract.Presenter by injector.with(this@OverviewFragment).instance()
+    private val mNavigationController: NavigationController by injector.instance()
+    private val mOverviewAdapter: RedditOverviewAdapter by injector.with(this@OverviewFragment).instance()
+
     private var mNoNewsView: View? = null
     private var mNewsView: RecyclerView? = null
 
@@ -56,13 +58,13 @@ class OverviewFragment : Fragment(), OverviewContract.View {
 
         val infiniteScrollListener = object : InfiniteScrollListener(mNewsView!!.layoutManager as LinearLayoutManager) {
             override fun loadingFunction() {
-                mOverviewPresenter!!.loadMoreRedditNews()
+                mOverviewPresenter.loadMoreRedditNews()
             }
         }
         swipeRefreshLayout.setScrollUpChild(mNewsView!!)
         swipeRefreshLayout.setOnRefreshListener {
             infiniteScrollListener.reset()
-            mOverviewPresenter!!.loadRedditNews(false)
+            mOverviewPresenter.loadRedditNews(false)
         }
 
 
@@ -73,20 +75,11 @@ class OverviewFragment : Fragment(), OverviewContract.View {
         return root
     }
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mOverviewAdapter = RedditOverviewAdapter(listener)
-    }
-
     override fun onResume() {
         super.onResume()
-        mOverviewPresenter!!.start()
+        mOverviewPresenter.start()
     }
 
-    override fun setPresenter(presenter: OverviewContract.Presenter) {
-        mOverviewPresenter = checkNotNull(presenter)
-    }
 
     override val isActive: Boolean
         get() = isAdded
@@ -101,13 +94,13 @@ class OverviewFragment : Fragment(), OverviewContract.View {
     }
 
     override fun showRedditNews(redditNews: List<RedditNewsData>) {
-        mOverviewAdapter!!.clearAndAddNews(redditNews)
+        mOverviewAdapter.clearAndAddNews(redditNews)
         mNewsView!!.visibility = View.VISIBLE
         mNoNewsView!!.visibility = View.GONE
     }
 
     override fun addRedditNews(redditNews: List<RedditNewsData>) {
-        mOverviewAdapter!!.addRedditNews(redditNews)
+        mOverviewAdapter.addRedditNews(redditNews)
     }
 
     override fun showRedditNewsLoadingError() {
@@ -121,9 +114,7 @@ class OverviewFragment : Fragment(), OverviewContract.View {
     }
 
     override fun showRedditNewsDetails(redditNewsUrl: String) {
-        val intent = Intent(context, DetailActivity::class.java)
-        intent.putExtra(DetailActivity.EXTRA_REDDIT_NEWS_URL, redditNewsUrl)
-        startActivity(intent)
+        mNavigationController.showDetails(redditNewsUrl)
     }
 
     companion object {

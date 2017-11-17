@@ -1,4 +1,4 @@
-package ch.zuehlke.sbb.reddit.features.overview.adapter
+package ch.zuehlke.sbb.reddit.features.news.overview.adapter
 
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup

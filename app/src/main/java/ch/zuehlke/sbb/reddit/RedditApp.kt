@@ -5,6 +5,10 @@ import android.arch.persistence.room.Room
 import android.content.Context
 import com.github.salomonbrys.kodein.*
 import de.dabotz.shoppinglist.database.AppDatabase
+import com.github.salomonbrys.kodein.Kodein
+import com.github.salomonbrys.kodein.KodeinAware
+import com.github.salomonbrys.kodein.android.androidActivityScope
+import com.github.salomonbrys.kodein.lazy
 
 /**
  * Created by chsc on 12.11.17.
@@ -24,5 +28,8 @@ class RedditApp : Application(), KodeinAware{
 
     override fun onCreate() {
         super.onCreate()
+        registerActivityLifecycleCallbacks(
+                androidActivityScope.lifecycleManager
+        )
     }
 }

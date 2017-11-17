@@ -1,9 +1,8 @@
-package ch.zuehlke.sbb.reddit.features.overview.adapter.impl
+package ch.zuehlke.sbb.reddit.features.news.overview.adapter.impl
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -12,8 +11,8 @@ import com.google.common.base.Strings
 import com.squareup.picasso.Picasso
 
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.features.overview.adapter.ViewType
-import ch.zuehlke.sbb.reddit.features.overview.adapter.ViewTypeDelegateAdapter
+import ch.zuehlke.sbb.reddit.features.news.overview.adapter.ViewType
+import ch.zuehlke.sbb.reddit.features.news.overview.adapter.ViewTypeDelegateAdapter
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.util.DateUtils
 
