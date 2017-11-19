@@ -25,38 +25,46 @@ class RedditNewsLocalDataSource constructor(context: Context, db: AppDatabase) :
     }
 
     override fun getNews(callback: RedditDataSource.LoadNewsCallback) {
-        val redditNews = mDb.redditNewsDataDao().getNews();
-
-
-        if (redditNews.isEmpty()) {
-            // This will be called if the table is new or just empty.
-            callback.onDataNotAvailable()
-        } else {
-            callback.onNewsLoaded(redditNews)
-        }
+        val redditNewsAccessor = AsyncDBAccessor<List<RedditNewsData>>(
+                {mDb.redditNewsDataDao().getNews()},
+                {result->
+                    if (result.isEmpty()) {
+                        // This will be called if the table is new or just empty.
+                        callback.onDataNotAvailable()
+                    } else {
+                        callback.onNewsLoaded(result)
+                    }
+        })
+        redditNewsAccessor.execute()
     }
 
     override fun getPosts(callback: RedditDataSource.LoadPostsCallback, permalink: String) {
-
-        val redditNews = mDb.reditPostsDataDao().getPosts(permalink)
-        if (redditNews.isEmpty()) {
-            // This will be called if the table is new or just empty.
-            callback.onDataNotAvailable()
-        } else {
-            callback.onPostsLoaded(redditNews)
-        }
+        val redditPostsAccessor = AsyncDBAccessor<List<RedditPostsData>>(
+                {mDb.reditPostsDataDao().getPosts(permalink)},
+                {result ->
+                    if (result.isEmpty()) {
+                        // This will be called if the table is new or just empty.
+                        callback.onDataNotAvailable()
+                    } else {
+                        callback.onPostsLoaded(result)
+                    }
+                }
+        )
+        redditPostsAccessor.execute()
     }
 
     override fun savePosts(data: List<RedditPostsData>) {
-
         checkNotNull(data)
-
-        mDb.reditPostsDataDao().addPostItems(data)
-
+        val asyncPostSaver = AsyncDBAccessor(
+                {mDb.reditPostsDataDao().addPostItems(data)},
+                {})
+        asyncPostSaver.go()
     }
 
     override fun deletePostsWithPermaLink(permaLink: String) {
-        mDb.reditPostsDataDao().deletePosts(permaLink)
+        AsyncDBAccessor({
+        mDb.reditPostsDataDao().deletePosts(permaLink)},{}).execute()
+
     }
 
     override fun refreshNews() {
@@ -65,12 +73,14 @@ class RedditNewsLocalDataSource constructor(context: Context, db: AppDatabase) :
     }
 
     override fun deleteAllNews() {
-        mDb.redditNewsDataDao().deleteNews()
+        AsyncDBAccessor({
+        mDb.redditNewsDataDao().deleteNews()},{}).execute()
     }
 
     override fun saveRedditNews(data: List<RedditNewsData>) {
         checkNotNull(data)
-        mDb.redditNewsDataDao().addNewsItem(data)
+        AsyncDBAccessor({
+        mDb.redditNewsDataDao().addNewsItem(data)},{}).execute()
     }
 
 }
