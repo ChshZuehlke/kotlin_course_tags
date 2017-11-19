@@ -10,10 +10,6 @@ import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.ActivityInjector
 import com.github.salomonbrys.kodein.instance
 
-/**
- * Created by chsc on 11.11.17.
- */
-
 class OverviewActivity : AppCompatActivity(), ActivityInjector {
 
     override val injector: KodeinInjector = KodeinInjector()
@@ -32,15 +28,13 @@ class OverviewActivity : AppCompatActivity(), ActivityInjector {
         // Set up the toolbar.
         setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
         val ab = supportActionBar
-        ab!!.setDisplayHomeAsUpEnabled(false)
-
+        ab?.setDisplayHomeAsUpEnabled(false)
 
         var overviewFragment: OverviewFragment? = supportFragmentManager.findFragmentById(R.id.contentFrame) as OverviewFragment?
         if (overviewFragment == null) {
             // Create the fragment
             overviewFragment = OverviewFragment.newInstance()
-            ActivityUtils.addFragmentToActivity(
-                    supportFragmentManager, overviewFragment!!, R.id.contentFrame)
+            ActivityUtils.addFragmentToActivity(supportFragmentManager, overviewFragment, R.id.contentFrame)
         }
 
         // Create the presenter

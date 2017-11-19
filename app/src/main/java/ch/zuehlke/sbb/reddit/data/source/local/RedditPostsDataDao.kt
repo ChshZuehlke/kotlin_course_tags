@@ -5,7 +5,7 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
-import io.reactivex.Flowable
+import io.reactivex.Single
 
 /**
  * Created by celineheldner on 16.11.17.
@@ -17,7 +17,7 @@ interface RedditPostsDataDao{
     fun getPosts(permalink: String?): List<RedditPostsData>
 
     @Query("select * from redditPosts where parentPermaLink = :permalink order by ordering")
-    fun getPostsFlowable(permalink: String?): Flowable<List<RedditPostsData>>
+    fun getPostsSingle(permalink: String?): Single<List<RedditPostsData>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addPostItems(item: List<RedditPostsData>)

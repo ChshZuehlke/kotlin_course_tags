@@ -55,9 +55,8 @@ class DetailActivity : AppCompatActivity(), ActivityInjector {
         destroyInjector()
     }
 
-        companion object {
-
-        val EXTRA_REDDIT_NEWS_URL = "redditNewsUrl"
-        private val TAG = "DetailActivity"
+    companion object {
+        const val EXTRA_REDDIT_NEWS_URL = "redditNewsUrl"
+        private const val TAG = "DetailActivity"
     }
 }

@@ -42,7 +42,7 @@ class DetailPresenter(detailView: DetailContract.View, repository: RedditReposit
         val subscription = mRepository
                 .posts(mRedditUrl)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread(), false, 1)
+                .observeOn(AndroidSchedulers.mainThread())
                 .filter { _ -> mDetailView.isActive }
                 .subscribeBy(
                         onError = { error ->

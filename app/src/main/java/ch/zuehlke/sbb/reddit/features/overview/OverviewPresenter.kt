@@ -67,7 +67,7 @@ class OverviewPresenter(private val view: OverviewContract.View, private val red
 
     override fun showRedditNews(redditNewsData: RedditNewsData) {
         checkNotNull(redditNewsData, "redditNewsData cannot be null!")
-        view.showRedditNewsDetails(redditNewsData.id!!)
+        view.showRedditNewsDetails(redditNewsData.id)
     }
 
     override fun loadRedditNews(forceUpdate: Boolean) {

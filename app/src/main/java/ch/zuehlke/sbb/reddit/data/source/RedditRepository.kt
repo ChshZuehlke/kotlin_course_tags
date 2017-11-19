@@ -15,7 +15,7 @@ class RedditRepository (val newsRemoteDataSource: RedditDataSource, val newsLoca
     private val sources = listOf(newsLocalDataSource, newsRemoteDataSource)
 
     override val news: Flowable<List<RedditNewsData>>
-        get() = Flowable.concat(sources.map{it.news}).filter{ it.isNotEmpty() }.replay().autoConnect()
+        get() = Flowable.concat(sources.map{it.news}).filter{ it.isNotEmpty() }
 
     private fun convertURLToRemote(url: String): String {
         val parsedUrl = url.substring(url.indexOf(COMMENT_SECION) + COMMENT_SECION.length)
@@ -24,14 +24,14 @@ class RedditRepository (val newsRemoteDataSource: RedditDataSource, val newsLoca
 
     override fun posts(permalink: String): Observable<List<RedditPostsData>> {
         val convertedPermalink = convertURLToRemote(permalink)
-        return Observable.merge(sources.map{it.posts(convertedPermalink)}, 1, 1)
+        return Observable.concat(sources.map{it.posts(convertedPermalink)})
     }
     override fun savePosts(data: List<RedditPostsData>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        newsLocalDataSource.savePosts(data)
     }
 
     override fun deletePostsWithPermaLink(permaLink: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        newsLocalDataSource.deletePostsWithPermaLink(permaLink)
     }
 
     private var mCacheIsDirty: Boolean = true
@@ -51,7 +51,6 @@ class RedditRepository (val newsRemoteDataSource: RedditDataSource, val newsLoca
 
         newsLocalDataSource.saveRedditNews(data)
         newsRemoteDataSource.saveRedditNews(data) // Although we call saveRedditNews() on the remote datasource, it is not implemented.
-
     }
 
     private fun refreshCache(news: List<RedditNewsData>) {
@@ -70,8 +69,6 @@ class RedditRepository (val newsRemoteDataSource: RedditDataSource, val newsLoca
     }
 
     companion object {
-        private const val TAG = "RemoteDataSource"
-
         private const val COMMENT_SECION = "comments/"
     }
 }

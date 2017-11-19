@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity(), FragmentActivityInjector {
             // Create the fragment
             loginFragment = LoginFragment.newInstance()
             ActivityUtils.addFragmentToActivity(
-                    supportFragmentManager, loginFragment!!, R.id.contentFrame)
+                    supportFragmentManager, loginFragment, R.id.contentFrame)
         }
     }
 

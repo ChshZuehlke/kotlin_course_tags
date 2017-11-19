@@ -42,7 +42,7 @@ fun createBaseModule(context: Context) = Kodein.Module{
                 .build()
     }
 
-    bind<RedditAPI>() with singleton { instance<Retrofit>().create<RedditAPI>(RedditAPI::class.java!!)  }
+    bind<RedditAPI>() with singleton { instance<Retrofit>().create<RedditAPI>(RedditAPI::class.java)  }
 
     bind<Gson>() with singleton {
         GsonBuilder()

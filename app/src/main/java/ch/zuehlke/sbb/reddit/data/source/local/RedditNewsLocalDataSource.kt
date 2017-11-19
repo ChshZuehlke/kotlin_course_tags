@@ -27,7 +27,8 @@ class RedditNewsLocalDataSource constructor(context: Context, db: AppDatabase, p
 
     override val news = mDb.redditNewsDataDao().getNewsSingle().toFlowable()
 
-    override fun posts(permalink: String): Observable<List<RedditPostsData>> = mDb.reditPostsDataDao().getPostsFlowable(permalink).toObservable().subscribeOn(ioScheduler)
+    override fun posts(permalink: String): Observable<List<RedditPostsData>> =
+            mDb.reditPostsDataDao().getPostsSingle(permalink).toObservable().subscribeOn(ioScheduler)
 
     override fun savePosts(data: List<RedditPostsData>) {
         checkNotNull(data)

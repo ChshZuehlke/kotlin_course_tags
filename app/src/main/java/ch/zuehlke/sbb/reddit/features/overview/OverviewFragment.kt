@@ -31,8 +31,8 @@ class OverviewFragment : Fragment(), OverviewContract.View {
 
     private val clickListener = object : GenericBindingViewHolder.GenericBindingClickListener {
         override fun onItemSelected(obj: Any) {
-            if (obj is RedditNewsData && obj.permaLink != null) {
-                showRedditNewsDetails(obj.permaLink!!)
+            if (obj is RedditNewsData) {
+                showRedditNewsDetails(obj.permaLink)
             }
         }
     }
@@ -99,15 +99,15 @@ class OverviewFragment : Fragment(), OverviewContract.View {
         if (view == null) {
             return
         }
-        val srl = view!!.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
+        val srl = view?.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
         // Make sure setRefreshing() is called after the layout is done with everything else.
-        srl.post { srl.isRefreshing = isActive }
+        srl?.post { srl.isRefreshing = isActive }
     }
 
     override fun showRedditNews(redditNews: List<RedditNewsData>) {
-        mOverviewAdapter!!.clearAndAddNews(redditNews)
-        mNewsView!!.visibility = View.VISIBLE
-        mNoNewsView!!.visibility = View.GONE
+        mOverviewAdapter?.clearAndAddNews(redditNews)
+        mNewsView?.visibility = View.VISIBLE
+        mNoNewsView?.visibility = View.GONE
     }
 
 
@@ -116,23 +116,24 @@ class OverviewFragment : Fragment(), OverviewContract.View {
     }
 
     override fun showRedditNewsLoadingError() {
-        Snackbar.make(view!!, R.string.overview_screen_error_loading_reddit_news, Snackbar.LENGTH_LONG)
+        view?.let {
+            Snackbar.make(it, R.string.overview_screen_error_loading_reddit_news, Snackbar.LENGTH_LONG)
+        }
     }
 
 
     override fun showNoNews() {
-        mNewsView!!.visibility = View.GONE
-        mNoNewsView!!.visibility = View.VISIBLE
+        mNewsView?.visibility = View.GONE
+        mNoNewsView?.visibility = View.VISIBLE
     }
 
-    override fun showRedditNewsDetails(redditNewsUrl: String) {
+    override fun showRedditNewsDetails(redditNewsId: String) {
         val intent = Intent(context, DetailActivity::class.java)
-        intent.putExtra(DetailActivity.EXTRA_REDDIT_NEWS_URL, redditNewsUrl)
+        intent.putExtra(DetailActivity.EXTRA_REDDIT_NEWS_URL, redditNewsId)
         startActivity(intent)
     }
 
     companion object {
-
         fun newInstance(): OverviewFragment {
             return OverviewFragment()
         }
