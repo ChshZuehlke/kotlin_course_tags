@@ -9,6 +9,7 @@ import java.util.LinkedHashMap
 
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
+import ch.zuehlke.sbb.reddit.util.AndroidUtils
 
 import com.google.common.base.Preconditions.checkNotNull
 
@@ -17,7 +18,7 @@ import com.google.common.base.Preconditions.checkNotNull
  */
 
 class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
-                    newsLocalDataSource: RedditDataSource, private val mContext: Context) : RedditDataSource {
+                    newsLocalDataSource: RedditDataSource, private val androidUtils: AndroidUtils) : RedditDataSource {
 
     private val mRedditNewsRemoteDataSource: RedditDataSource
 
@@ -62,12 +63,6 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
         })
     }
 
-    private val isNetworkAvailable: Boolean
-        get() {
-            val connectivityManager = mContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val activeNetworkInfo = connectivityManager.activeNetworkInfo
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected
-        }
 
     override fun getNews(callback: RedditDataSource.LoadNewsCallback) {
         checkNotNull(callback)
@@ -79,7 +74,7 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
             return
         }
 
-        if (!isNetworkAvailable) {
+        if (!androidUtils.isNetworkAvailable()) {
             // Query the local storage if available. If not, query the network.
             mRedditNewsLocalDataSource.getNews(object : RedditDataSource.LoadNewsCallback {
                 override fun onNewsLoaded(tasks: List<RedditNewsData>) {

@@ -1,4 +1,4 @@
-package ch.zuehlke.sbb.reddit
+package ch.zuehlke.sbb.reddit.kodein
 
 import android.content.Context
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
@@ -8,6 +8,8 @@ import ch.zuehlke.sbb.reddit.data.source.remote.RedditAPI
 import ch.zuehlke.sbb.reddit.data.source.remote.RedditElementTypeAdapterFactory
 import ch.zuehlke.sbb.reddit.data.source.remote.RedditNewsDataRemoteDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
+import ch.zuehlke.sbb.reddit.mock.RedditNewsDataRemoteDataSourceMock
+import ch.zuehlke.sbb.reddit.mock.RedditNewsLocalDataSourceMock
 import ch.zuehlke.sbb.reddit.util.AndroidUtils
 import com.github.salomonbrys.kodein.*
 import com.google.gson.Gson
@@ -21,7 +23,7 @@ import java.lang.reflect.Modifier
  * Created by celineheldner on 15.11.17.
  */
 
-fun createBaseModule(context: Context) = Kodein.Module{
+fun createBaseModule() = Kodein.Module{
 
     val REDDIT_END_POINT = "https://www.reddit.com/r/dota2/"
 
@@ -49,24 +51,13 @@ fun createBaseModule(context: Context) = Kodein.Module{
                 .create()
     }
 
-    bind<AndroidUtils>() with singleton { AndroidUtils(context) }
+    bind<RedditDataSource>("remoteDSMock") with singleton { RedditNewsDataRemoteDataSourceMock()}
+    bind<RedditDataSource>("localDSMock") with singleton { RedditNewsLocalDataSourceMock()}
 
-    /**
-     * The Datasources don't need to be implemented as singletons anymore. Kodein can handle that
-     * Binding the two Datasources as Singletons
-     * Needs Tagging to differentiate the instances
-     */
-    bind<RedditDataSource>("remoteDS") with singleton { RedditNewsDataRemoteDataSource(context, instance(),instance(), type) }
-    bind<RedditDataSource>("localDS") with singleton { RedditNewsLocalDataSource(context, instance()) }
-
-    /**
-     * the RedditRepository does not need to be implemented as a singleton -> Kodein can handle that
-     * Retrievs the two DataSource-Instances bound previously using a tag
-     */
     bind<RedditRepository>() with eagerSingleton {
         RedditRepository(
-                instance("remoteDS"),
-                instance("localDS"),
+                instance("remoteDSMock"),
+                instance("localDSMock"),
                 instance())
     }
 
