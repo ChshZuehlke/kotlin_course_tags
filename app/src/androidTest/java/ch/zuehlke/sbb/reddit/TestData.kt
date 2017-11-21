@@ -17,9 +17,4 @@ object TestData{
     val redditNews2 = RedditNewsData("author2","title2",4,19060,null,null,"remoteNews2","/r/DotA2/comments/7ckn4x/nov_13_competitive_matches_southeast_asia/")
 
     val initialNews = Arrays.asList(redditNews1, redditNews2)
-
-    val redditNews3 = RedditNewsData("author3","title3",4,19060,null,null,"remoteNews3","/r/DotA2/comments/7ckn4x/nov_13_competitive_matches_southeast_asia/")
-    val redditNews4 = RedditNewsData("author4","title4",4,19060,null,null,"remoteNews4","/r/DotA2/comments/7ckn4x/nov_13_competitive_matches_southeast_asia/")
-
-    val initialMoreNews = Arrays.asList(redditNews3, redditNews4)
 }
