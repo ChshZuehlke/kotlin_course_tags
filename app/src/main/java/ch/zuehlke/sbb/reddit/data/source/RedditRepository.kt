@@ -75,17 +75,8 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
         }
 
         if (!androidUtils.isNetworkAvailable()) {
-            // Query the local storage if available. If not, query the network.
-            mRedditNewsLocalDataSource.getNews(object : RedditDataSource.LoadNewsCallback {
-                override fun onNewsLoaded(tasks: List<RedditNewsData>) {
-                    refreshCache(tasks)
-                    callback.onNewsLoaded(ArrayList(mCacheNews!!.values))
-                }
-
-                override fun onDataNotAvailable() {
-                    callback.onDataNotAvailable()
-                }
-            })
+            // Query the local storage if available. If not, call DataNotAvailable.
+            retrieveLocalNews(callback, {callback.onDataNotAvailable()})
 
         } else {
             if (mCacheIsDirty) {
@@ -103,20 +94,22 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
                 })
             } else {
                 // Query the local storage if available. If not, query the network.
-                mRedditNewsLocalDataSource.getNews(object : RedditDataSource.LoadNewsCallback {
-                    override fun onNewsLoaded(tasks: List<RedditNewsData>) {
-                        refreshCache(tasks)
-                        callback.onNewsLoaded(ArrayList(mCacheNews!!.values))
-                    }
-
-                    override fun onDataNotAvailable() {
-                        getNewsFromRemoteDataSource(callback)
-                    }
-                })
+                retrieveLocalNews(callback, {getNewsFromRemoteDataSource(callback)})
             }
         }
+    }
 
+    private fun retrieveLocalNews(callback: RedditDataSource.LoadNewsCallback, onNotAvailable: () -> Any = {}) {
+        mRedditNewsLocalDataSource.getNews(object : RedditDataSource.LoadNewsCallback {
+            override fun onNewsLoaded(tasks: List<RedditNewsData>) {
+                refreshCache(tasks)
+                callback.onNewsLoaded(ArrayList(mCacheNews!!.values))
+            }
 
+            override fun onDataNotAvailable() {
+                kotlin.run(onNotAvailable)
+            }
+        })
     }
 
     override fun getPosts(callback: RedditDataSource.LoadPostsCallback, permalink: String) {

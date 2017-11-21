@@ -39,11 +39,11 @@ class RedditNewsLocalDataSourceMock: RedditDataSourceMock(), RedditDataSource{
     }
 
     override fun refreshNews() {
-        TODO("not implemented in local") //To change body of created functions use File | Settings | File Templates.
+        //no need for local datasource
     }
 
     override fun getMoreNews(callback: RedditDataSource.LoadNewsCallback) {
-        TODO("not implemented in local") //To change body of created functions use File | Settings | File Templates.
+        //no need for local datasource
     }
 
 

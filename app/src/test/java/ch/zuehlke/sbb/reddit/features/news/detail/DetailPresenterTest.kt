@@ -1,8 +1,6 @@
 package ch.zuehlke.sbb.reddit.features.news.detail
 
-import ch.zuehlke.sbb.reddit.data.source.RedditRepository
 import ch.zuehlke.sbb.reddit.kodein.createBaseModule
-import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import ch.zuehlke.sbb.reddit.util.AndroidUtils
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.bind
@@ -37,18 +35,6 @@ class DetailPresenterTest {
     fun loadRedditPostsOnNetworkAvailable() {
         presenter.loadRedditPosts()
         verify(view, times(2)).showRedditPosts(any())
-    }
-
-    @Test
-    fun loadRedditPostsOnNetworkNotAvailable() {
-        //given
-        val androidUtils = mock<AndroidUtils> {
-            on { isNetworkAvailable() } doReturn false
-        }
-        val repository = RedditRepository(kodein.instance("remoteDSMock"), kodein.instance("localDSMock"),androidUtils)
-        presenter = DetailPresenter(view, repository,"/r/DotA2/comments/7ckn4x/nov_13_competitive_matches_southeast_asia/")
-        presenter.loadRedditPosts()
-        verify(view, times(2)).showRedditPosts(ArrayList<RedditPostsData>())
     }
 
 }

@@ -30,17 +30,18 @@ class RedditNewsDataRemoteDataSourceMock: RedditDataSourceMock(), RedditDataSour
     }
 
     override fun savePosts(data: List<RedditPostsData>) {
-        TODO("not implemented for remote") //To change body of created functions use File | Settings | File Templates.
+        // not implemented for remote
     }
 
     override fun deletePostsWithPermaLink(permaLink: String) {
-        TODO("not implemented for remote") //To change body of created functions use File | Settings | File Templates.
+        // not implemented for remote
     }
 
     override fun deleteAllNews() {
-        TODO("not implemented for remote") //To change body of created functions use File | Settings | File Templates.
+        // not implemented for remote
     }
 
     override fun saveRedditNews(data: List<RedditNewsData>) {
+        // not implemented for remote
     }
 }
