@@ -14,6 +14,7 @@ import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.exceptions.Exceptions
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.io.IOException
 import java.lang.reflect.Type
@@ -48,11 +49,22 @@ class RedditNewsDataRemoteDataSource constructor(val context: Context, val reddi
                         val requestNews = requestNews(next).subscribeOn(Schedulers.io())
 
                         Log.d(TAG, "Waiting for the response on thread ${Thread.currentThread().name}")
-                        requestNews.subscribe { (news, _) ->
-                            Log.d(TAG, "Received page")
-                            emitter.onNext(news.mapNotNull { it })
+                        requestNews.subscribeBy(
+                                onSuccess = { (news, _) ->
+                                    Log.d(TAG, "Received page")
+                                    emitter.onNext(news.mapNotNull { it })
+                                },
+                                onError = { error ->
+                                    Log.e(TAG, "Problem when receiving page: $error")
+                                    emitter.onError(error)
+                                })
+                        try {
+                            return requestNews.blockingGet().second ?: ""
+                        } catch (error: Exception) {
+                            Log.e(TAG, "Problem when receiving the next pages tag: $error")
+                            emitter.onError(error)
+                            return ""
                         }
-                        return requestNews.blockingGet().second ?: ""
                     })
         }
 
@@ -68,13 +80,13 @@ class RedditNewsDataRemoteDataSource constructor(val context: Context, val reddi
         }
     }
 
-    override fun posts(permaLink: String): Observable<List<RedditPostsData>> {
-        return redditAPI.getRedditPosts(permaLink, "new")
+    override fun posts(permalink: String): Observable<List<RedditPostsData>> {
+        return redditAPI.getRedditPosts(permalink, "new")
                 .map { response ->
                     Log.d(TAG, "Loading posts on ${Thread.currentThread().name}")
                     try {
                         val redditPostElements: List<RedditPostElement> = mGson.fromJson<List<RedditPostElement>>(response.string(), mType)
-                        flattenRetrofitResponse(redditPostElements, permaLink)
+                        flattenRetrofitResponse(redditPostElements, permalink)
                     } catch (e: IOException) {
                         throw Exceptions.propagate(e)
                     }
