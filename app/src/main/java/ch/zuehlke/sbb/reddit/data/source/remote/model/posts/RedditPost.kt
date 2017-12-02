@@ -27,5 +27,4 @@ class RedditPost {
     @Expose
     var permalink: String? = null
 
-
 }

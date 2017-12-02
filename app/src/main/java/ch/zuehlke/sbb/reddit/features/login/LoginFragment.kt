@@ -59,7 +59,6 @@ class LoginFragment : Fragment(), LoginContract.View {
                 password!!.error = getString(R.string.login_screen_invalid_password_length)
             }
         }
-
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
            // DO nothing
         }
@@ -67,7 +66,6 @@ class LoginFragment : Fragment(), LoginContract.View {
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             // Do nothing
         }
-
     }
 
     override fun onResume() {
@@ -83,6 +81,7 @@ class LoginFragment : Fragment(), LoginContract.View {
         loginButton.setOnClickListener(null)
         username.removeTextChangedListener(usernameListener)
         password.removeTextChangedListener(passwordListener)
+
         super.onPause()
     }
 

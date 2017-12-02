@@ -63,19 +63,4 @@ class DetailPresenter(detailView: DetailContract.View, repository: RedditReposit
         }, mRedditUrl)
 
     }
-
-    companion object {
-
-        private val type = object : TypeToken<List<RedditPostElement>>() {
-
-        }.type
-
-        private val gson = GsonBuilder()
-                .registerTypeAdapterFactory(elementTypeAdapterFactory)
-                .create()
-
-
-        private val TAG = "DetailPresenter"
-    }
-
 }
