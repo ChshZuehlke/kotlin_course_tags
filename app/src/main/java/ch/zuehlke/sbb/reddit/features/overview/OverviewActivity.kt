@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar
 import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.extensions.addFragment
+import kotlinx.android.synthetic.main.activity_overview.*
 
 /**
  * Created by chsc on 11.11.17.
@@ -22,10 +23,10 @@ class OverviewActivity : AppCompatActivity() {
         setContentView(R.layout.activity_overview)
 
         // Set up the toolbar.
-        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
-        val ab = supportActionBar
-        ab!!.setDisplayHomeAsUpEnabled(false)
-
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(false)
+        }
 
         var overviewFragment: OverviewFragment? = supportFragmentManager.findFragmentById(R.id.contentFrame) as OverviewFragment?
         if (overviewFragment == null) {

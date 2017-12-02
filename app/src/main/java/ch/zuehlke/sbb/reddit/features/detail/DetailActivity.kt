@@ -9,6 +9,7 @@ import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.extensions.addFragment
 import ch.zuehlke.sbb.reddit.extensions.logI
+import kotlinx.android.synthetic.main.activity_detail.*
 
 /**
  * Created by chsc on 11.11.17.
@@ -24,9 +25,10 @@ class DetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_detail)
 
         // Set up the toolbar.
-        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
-        val ab = supportActionBar
-        ab!!.setDisplayHomeAsUpEnabled(false)
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(false)
+        }
 
         val redditUrl = intent.getStringExtra(EXTRA_REDDIT_NEWS_URL)
         logI("RedditUrl: $redditUrl")
@@ -34,7 +36,7 @@ class DetailActivity : AppCompatActivity() {
         if (detailFragment == null) {
             // Create the fragment
             detailFragment = DetailFragment.newInstance()
-            addFragment( detailFragment, R.id.contentFrame)
+            addFragment(detailFragment, R.id.contentFrame)
         }
 
         // Create the presenter
@@ -44,5 +46,5 @@ class DetailActivity : AppCompatActivity() {
     companion object {
 
         val EXTRA_REDDIT_NEWS_URL = "redditNewsUrl"
-          }
+    }
 }
