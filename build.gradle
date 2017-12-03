@@ -32,6 +32,8 @@ ext{
     retrofit_version = '2.0.0'
     kodein_version = '4.1.0'
     room_version = '1.0.0'
+    rxjava_version = '2.1.7'
+    rxjava_android_version = '2.0.1'
 }
 
 task clean(type: Delete) {

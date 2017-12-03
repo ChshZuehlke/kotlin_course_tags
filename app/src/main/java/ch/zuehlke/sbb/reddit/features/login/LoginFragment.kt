@@ -16,6 +16,7 @@ import com.github.salomonbrys.kodein.with
 import com.google.common.base.Strings
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_login.*
 import java.util.concurrent.TimeUnit
@@ -84,6 +85,7 @@ class LoginFragment : BaseFragment(), LoginContract.View {
 
         disposable.add(usernameTextObservable
                 .debounce(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::validateUsername))
 
         password.addTextChangedListener(passwordListener)
