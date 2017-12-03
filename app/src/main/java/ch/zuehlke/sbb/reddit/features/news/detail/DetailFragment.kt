@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,9 +13,6 @@ import ch.zuehlke.sbb.reddit.features.BaseFragment
 import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
 import ch.zuehlke.sbb.reddit.features.news.detail.DetailsFragmentKodeinModule.createNewsDetailsModule
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
-
-import com.google.common.base.Preconditions.checkNotNull
-import kotlinx.android.synthetic.main.fragment_detail.*
 import com.github.salomonbrys.kodein.instance
 import com.github.salomonbrys.kodein.with
 import kotlinx.android.synthetic.main.fragment_detail.*
@@ -54,7 +50,7 @@ class DetailFragment : BaseFragment(), DetailContract.View {
 
         redditPostView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = mAdapter
+            adapter = mDetailAdapter
             setHasFixedSize(true)
         }
 
@@ -80,7 +76,7 @@ class DetailFragment : BaseFragment(), DetailContract.View {
 
     override fun showRedditPosts(posts: List<RedditPostsData>) {
         Log.i(TAG, "Got " + posts.size + " posts")
-        mAdapter.clearAndAddPosts(posts)
+        mDetailAdapter!!.clearAndAddPosts(posts)
     }
 
     override fun showRedditNewsLoadingError() {

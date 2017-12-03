@@ -12,8 +12,7 @@ import ch.zuehlke.sbb.reddit.features.BaseFragment
 import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
 import ch.zuehlke.sbb.reddit.features.news.NavigationController
 import ch.zuehlke.sbb.reddit.features.news.overview.OverviewFragmentKodeinModule.createNewsOverviewModule
-import ch.zuehlke.sbb.reddit.features.news.overview.OverviewFragmentKodeinModule.createNewsOverviewModule
-import ch.zuehlke.sbb.reddit.features.news.overview.adapter.impl.RedditNewsDelegateAdapter.OnNewsSelectedListener
+
 
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import com.github.salomonbrys.kodein.instance
