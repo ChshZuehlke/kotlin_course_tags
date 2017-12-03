@@ -26,7 +26,7 @@ class FakeRedditNewsRemoteDataSource// Prevent direct instantiation.
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun savePosts(data: RedditPostsData) {
+    override fun savePosts(data: List<RedditPostsData>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -49,7 +49,7 @@ class FakeRedditNewsRemoteDataSource// Prevent direct instantiation.
     }
 
 
-    override fun saveRedditNews(@NonNull data: RedditNewsData) {
+    override fun saveRedditNews(@NonNull data: List<RedditNewsData>) {
         // In this demo app we do not support posting of news, therefore not implemented.
     }
 

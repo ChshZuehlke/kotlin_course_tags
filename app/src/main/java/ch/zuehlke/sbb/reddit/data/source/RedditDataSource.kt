@@ -30,7 +30,7 @@ interface RedditDataSource {
 
     fun getPosts(callback: LoadPostsCallback, title: String)
 
-    fun savePosts(data: RedditPostsData)
+    fun savePosts(data: List<RedditPostsData>)
 
     fun deletePostsWithPermaLink(permaLink: String)
 
@@ -38,5 +38,5 @@ interface RedditDataSource {
 
     fun deleteAllNews()
 
-    fun saveRedditNews(data: RedditNewsData)
+    fun saveRedditNews(data: List<RedditNewsData>)
 }

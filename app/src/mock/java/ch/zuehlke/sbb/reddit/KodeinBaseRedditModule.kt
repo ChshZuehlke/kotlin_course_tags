@@ -5,10 +5,7 @@ import ch.zuehlke.sbb.reddit.data.FakeRedditNewsRemoteDataSource
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
 import ch.zuehlke.sbb.reddit.data.source.local.RedditNewsLocalDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.RedditElementTypeAdapterFactory
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.bind
-import com.github.salomonbrys.kodein.eagerSingleton
-import com.github.salomonbrys.kodein.singleton
+import com.github.salomonbrys.kodein.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
@@ -28,7 +25,7 @@ fun createBaseModule(context: Context) = Kodein.Module{
     bind<RedditRepository>() with eagerSingleton {
                 RedditRepository(
                         FakeRedditNewsRemoteDataSource(),
-                        RedditNewsLocalDataSource(context),
+                        RedditNewsLocalDataSource(context, instance()),
                         context)
     }
 }

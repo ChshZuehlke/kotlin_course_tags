@@ -110,7 +110,7 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
 
     }
 
-    override fun savePosts(data: RedditPostsData) {
+    override fun savePosts(data: List<RedditPostsData>) {
         //Remotly its not used
     }
 
@@ -185,7 +185,7 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
         // Not supported by Reddit :)
     }
 
-    override fun saveRedditNews(data: RedditNewsData) {
+    override fun saveRedditNews(data: List<RedditNewsData>) {
         // In this demo app we do not support posting of news, therefore not implemented.
     }
 }
