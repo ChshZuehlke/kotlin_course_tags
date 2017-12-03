@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.support.v7.widget.Toolbar
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.BaseActivity
-import ch.zuehlke.sbb.reddit.features.news.NavigationController
-import ch.zuehlke.sbb.reddit.features.news.createNewsActivityModule
+import ch.zuehlke.sbb.reddit.features.news.NewsActivityKodeinModule.createNewsActivityModule
 import com.github.salomonbrys.kodein.instance
-import com.github.salomonbrys.kodein.with
 
 /**
  * Created by chsc on 11.11.17.

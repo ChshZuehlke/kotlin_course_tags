@@ -14,6 +14,9 @@ import ch.zuehlke.sbb.reddit.features.BaseFragment
 import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
 import ch.zuehlke.sbb.reddit.features.news.detail.DetailsFragmentKodeinModule.createNewsDetailsModule
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
+
+import com.google.common.base.Preconditions.checkNotNull
+import kotlinx.android.synthetic.main.fragment_detail.*
 import com.github.salomonbrys.kodein.instance
 import com.github.salomonbrys.kodein.with
 import kotlinx.android.synthetic.main.fragment_detail.*
@@ -43,25 +46,26 @@ class DetailFragment : BaseFragment(), DetailContract.View {
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return LayoutInflater.from(context).inflate(R.layout.fragment_detail, container, false)
+        return LayoutInflater.from(context).inflate(R.layout.fragment_detail,container,false)
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         redditPostView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = mDetailAdapter
+            adapter = mAdapter
             setHasFixedSize(true)
         }
-        // Set up progress indicator
+
         refreshLayout.apply {
             setColorSchemeColors(
                     ContextCompat.getColor(activity, R.color.colorPrimary),
                     ContextCompat.getColor(activity, R.color.colorAccent),
                     ContextCompat.getColor(activity, R.color.colorPrimaryDark)
             )
-            setScrollUpChild(redditPostView!!)
-            setOnRefreshListener { mPresenter.loadRedditPosts() }
+            setScrollUpChild(redditPostView)
+            setOnRefreshListener { mPresenter!!.loadRedditPosts() }
         }
     }
 
@@ -76,7 +80,7 @@ class DetailFragment : BaseFragment(), DetailContract.View {
 
     override fun showRedditPosts(posts: List<RedditPostsData>) {
         Log.i(TAG, "Got " + posts.size + " posts")
-        mDetailAdapter?.clearAndAddPosts(posts)
+        mAdapter.clearAndAddPosts(posts)
     }
 
     override fun showRedditNewsLoadingError() {

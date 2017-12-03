@@ -3,7 +3,7 @@ package ch.zuehlke.sbb.reddit.features.login
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.util.ActivityUtils
+import ch.zuehlke.sbb.reddit.extensions.addFragment
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.AppCompatActivityInjector
@@ -34,8 +34,7 @@ class LoginActivity : AppCompatActivity(), AppCompatActivityInjector{
         if (loginFragment == null) {
             // Create the fragment
             loginFragment = LoginFragment.newInstance()
-            ActivityUtils.addFragmentToActivity(
-                    supportFragmentManager, loginFragment!!, R.id.contentFrame)
+            addFragment(loginFragment!!, R.id.contentFrame)
         }
     }
 

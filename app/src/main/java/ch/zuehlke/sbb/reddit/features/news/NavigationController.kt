@@ -1,12 +1,9 @@
 package ch.zuehlke.sbb.reddit.features.news
 
-import android.app.Activity
 import android.support.v7.app.AppCompatActivity
-import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.features.BaseActivity
+import ch.zuehlke.sbb.reddit.extensions.addFragment
 import ch.zuehlke.sbb.reddit.features.news.detail.DetailFragment
 import ch.zuehlke.sbb.reddit.features.news.overview.OverviewFragment
-import ch.zuehlke.sbb.reddit.util.ActivityUtils
 
 /**
  * Created by celineheldner on 17.11.17.
@@ -20,15 +17,13 @@ class NavigationController constructor(activity: AppCompatActivity, fragmentCont
         if (overviewFragment == null) {
             // Create the fragment
             overviewFragment = OverviewFragment.newInstance()
-            ActivityUtils.addFragmentToActivity(
-                    mActivity.supportFragmentManager, overviewFragment!!, mContainerId)
+            mActivity.addFragment(overviewFragment!!, mContainerId)
         }
     }
 
     fun showDetails(redditUrl: String?){
         // Create the fragment
         val detailFragment: DetailFragment = DetailFragment.newInstance(redditUrl!!)
-        ActivityUtils.addFragmentToActivity(
-                mActivity.supportFragmentManager, detailFragment, mContainerId!!)
+        mActivity.addFragment( detailFragment, mContainerId!!)
     }
 }

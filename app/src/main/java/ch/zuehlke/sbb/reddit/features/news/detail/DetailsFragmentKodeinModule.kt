@@ -15,9 +15,9 @@ object DetailsFragmentKodeinModule{
 
     fun createNewsDetailsModule(view: DetailContract.View, redditUrl: String) = Kodein.Module{
 
-        bind<DetailContract.Presenter>() with scopedSingleton(androidSupportFragmentScope){
-            DetailPresenter(view,instance(), it.arguments.getString(redditUrl))
-        }
+    bind<DetailContract.Presenter>() with scopedSingleton(androidSupportFragmentScope){
+        DetailPresenter(view,instance(), it.arguments.getString(redditUrl))
+    }
 
 
     }
