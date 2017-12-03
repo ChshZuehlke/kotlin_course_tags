@@ -18,6 +18,7 @@ import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_login.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by chsc on 08.11.17.
@@ -33,6 +34,29 @@ class LoginFragment : BaseFragment(), LoginContract.View {
     private val loginListener = View.OnClickListener { mPresenter!!.login(username.text.toString(), password.text.toString()) }
 
     private val disposable = CompositeDisposable()
+
+    val usernameTextObservable = Observable.create(ObservableOnSubscribe<String> { emitter ->
+        // Isolated callback connected to the emitter
+        val textWatcher: TextWatcher = object : TextWatcher {
+            override fun afterTextChanged(editable: Editable) {
+                emitter.onNext(editable.toString())
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                // Do nothing
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                // Do nothing
+            }
+        }
+        // Register on subscription
+        username.addTextChangedListener(textWatcher)
+        // De-register on cancellation
+        emitter.setCancellable {
+            username.removeTextChangedListener(textWatcher)
+        }
+    })
 
     private val passwordListener = object : TextWatcher{
         override fun afterTextChanged(editable: Editable) {
@@ -58,29 +82,9 @@ class LoginFragment : BaseFragment(), LoginContract.View {
         mPresenter.start()
         loginButton.setOnClickListener(loginListener)
 
-        val usernameTextObservable = Observable.create(ObservableOnSubscribe<String> { emitter ->
-            // Isolated callback connected to the emitter
-            val textWatcher: TextWatcher = object : TextWatcher {
-                override fun afterTextChanged(editable: Editable) {
-                    emitter.onNext(editable.toString())
-                }
-
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    // Do nothing
-                }
-
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    // Do nothing
-                }
-            }
-            // Register on subscription
-            username.addTextChangedListener(textWatcher)
-            // De-register on cancellation
-            emitter.setCancellable {
-                username.removeTextChangedListener(textWatcher)
-            }
-        })
-        disposable.add(usernameTextObservable.subscribe(this::validateUsername))
+        disposable.add(usernameTextObservable
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .subscribe(this::validateUsername))
 
         password.addTextChangedListener(passwordListener)
     }
