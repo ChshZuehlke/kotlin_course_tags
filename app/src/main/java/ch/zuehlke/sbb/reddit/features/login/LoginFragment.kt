@@ -12,10 +12,12 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.BaseFragment
+import ch.zuehlke.sbb.reddit.features.login.LoginActivityKodeinModule.createLoginModule
 import ch.zuehlke.sbb.reddit.features.news.NewsActivity
 import com.github.salomonbrys.kodein.instance
 import com.github.salomonbrys.kodein.with
 import com.google.common.base.Strings
+import kotlinx.android.synthetic.main.fragment_login.*
 
 /**
  * Created by chsc on 08.11.17.
@@ -28,83 +30,80 @@ class LoginFragment : BaseFragment(), LoginContract.View {
     //injected
     private val mPresenter: LoginContract.Presenter by injector.with(this@LoginFragment).instance()
 
+    private val loginListener = View.OnClickListener { mPresenter!!.login(username.text.toString(), password.text.toString()) }
 
-    private var mProgessBar: ProgressBar? = null
-    private var mLoginButton: AppCompatButton? = null
-    private var mUsername: TextInputEditText? = null
-    private var mPassword: TextInputEditText? = null
+    private val usernameListener = object: TextWatcher{
+        override fun afterTextChanged(editable: Editable) {
+            if (editable.length > 0 && verifyIsEmail(editable.toString())) {
+                username!!.error = null
+            } else {
+                username!!.error = getString(R.string.login_screen_invalid_email)
+            }
+        }
+
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            // Do nothing
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            // Do nothing
+        }
+    }
+
+    private val passwordListener = object : TextWatcher{
+
+        override fun afterTextChanged(editable: Editable) {
+            if (verifyPasswordLength(editable.toString())) {
+                password!!.error = null
+            } else {
+                password!!.error = getString(R.string.login_screen_invalid_password_length)
+            }
+        }
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+           // DO nothing
+        }
+
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            // Do nothing
+        }
+    }
 
     override fun onResume() {
         super.onResume()
+
         mPresenter.start()
+        loginButton.setOnClickListener(loginListener)
+        username.addTextChangedListener(usernameListener)
+        password.addTextChangedListener(passwordListener)
+    }
+
+    override fun onPause() {
+        loginButton.setOnClickListener(null)
+        username.removeTextChangedListener(usernameListener)
+        password.removeTextChangedListener(passwordListener)
+
+        super.onPause()
     }
 
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
+            = LayoutInflater.from(context).inflate(R.layout.fragment_login,container,false)
 
-        val root = inflater!!.inflate(R.layout.fragment_login, container, false)
-        mProgessBar = root.findViewById<ProgressBar>(R.id.progressBar)
-        mLoginButton = root.findViewById<AppCompatButton>(R.id.loginButton)
-        mUsername = root.findViewById<TextInputEditText>(R.id.username)
-        mPassword = root.findViewById<TextInputEditText>(R.id.password)
-
-        mLoginButton!!.setOnClickListener { mPresenter.login(mUsername!!.text.toString(), mPassword!!.text.toString()) }
-
-
-        mUsername!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                // Do nothing
-            }
-
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                // Do nothing
-            }
-
-            override fun afterTextChanged(editable: Editable) {
-                if (editable.length > 0 && verifyIsEmail(editable.toString())) {
-                    mUsername!!.error = null
-                } else {
-                    mUsername!!.error = getString(R.string.login_screen_invalid_email)
-                }
-            }
-        })
-
-        mPassword!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-            }
-
-            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-            }
-
-            override fun afterTextChanged(editable: Editable) {
-                if (verifyPasswordLength(editable.toString())) {
-                    mPassword!!.error = null
-                } else {
-                    mPassword!!.error = getString(R.string.login_screen_invalid_password_length)
-                }
-            }
-        })
-
-        return root
-
-    }
 
     override val isActive: Boolean
         get() = isAdded
 
     override fun setLoadingIndicator(isActive: Boolean) {
-        mProgessBar!!.visibility = if (isActive) View.VISIBLE else View.GONE
+        progressBar.visibility = if (isActive) View.VISIBLE else View.GONE
     }
 
     override fun showInvalidUsername() {
-        mUsername!!.error = getString(R.string.login_screen_invalid_username)
+        username.error = getString(R.string.login_screen_invalid_username)
     }
 
     override fun showInvalidPassword() {
-        mPassword!!.error = getString(R.string.login_screen_invalid_password)
+        password.error = getString(R.string.login_screen_invalid_password)
     }
 
 

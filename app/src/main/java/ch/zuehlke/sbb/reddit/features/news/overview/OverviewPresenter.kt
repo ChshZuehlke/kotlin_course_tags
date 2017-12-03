@@ -103,7 +103,6 @@ class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRep
             } else {
                 mOverviewView.showRedditNews(news)
             }
-
         }
     }
 

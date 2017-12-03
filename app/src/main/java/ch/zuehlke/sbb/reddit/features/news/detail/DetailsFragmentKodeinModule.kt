@@ -10,13 +10,18 @@ import com.github.salomonbrys.kodein.scopedSingleton
 /**
  * Created by celineheldner on 17.11.17.
  */
-fun createNewsDetailsModule(view: DetailContract.View, redditUrl: String) = Kodein.Module{
 
-    bind<DetailContract.Presenter>() with scopedSingleton(androidSupportFragmentScope){
-        DetailPresenter(view,instance(), it.arguments.getString(redditUrl))
-    }
+object DetailsFragmentKodeinModule{
 
-    bind<DetailAdapter>() with scopedSingleton(androidSupportFragmentScope){
-        DetailAdapter(it.context)
+    fun createNewsDetailsModule(view: DetailContract.View, redditUrl: String) = Kodein.Module{
+
+        bind<DetailContract.Presenter>() with scopedSingleton(androidSupportFragmentScope){
+            DetailPresenter(view,instance(), it.arguments.getString(redditUrl))
+        }
+
+        bind<DetailAdapter>() with scopedSingleton(androidSupportFragmentScope){
+            DetailAdapter(it.context)
+        }
     }
 }
+

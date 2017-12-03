@@ -14,7 +14,7 @@ import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.news.overview.adapter.ViewType
 import ch.zuehlke.sbb.reddit.features.news.overview.adapter.ViewTypeDelegateAdapter
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
-import ch.zuehlke.sbb.reddit.util.DateUtils
+import ch.zuehlke.sbb.reddit.extensions.friendlyTime
 
 /**
  * Created by chsc on 12.11.17.
@@ -49,7 +49,7 @@ class RedditNewsDelegateAdapter(private val mListener: RedditNewsDelegateAdapter
             mComments.text = data.numberOfComments.toString()
             mAuthor.text = data.author
             mTitle.text = data.title
-            mTime.text = DateUtils.friendlyTime(data.created)
+            mTime.text = data.created.friendlyTime()
             if (Strings.isNullOrEmpty(data.thumbnailUrl)) {
                 Picasso.with(mContext).load(R.drawable.reddit_placeholder).into(mThumbnail)
             } else {

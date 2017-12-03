@@ -5,7 +5,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
-import ch.zuehlke.sbb.reddit.util.DateUtils
+import ch.zuehlke.sbb.reddit.extensions.friendlyTime
 
 import com.google.common.base.Strings.repeat
 
@@ -64,7 +64,7 @@ abstract class AbstractTestCase {
 
                 if (dataElement.data!!.created_utc != 0L) {
                     print("Created=")
-                    println(DateUtils.friendlyTime(dataElement.data!!.created_utc))
+                    println(dataElement.data!!.created_utc.friendlyTime())
                 }
 
                 if (dataElement.data!!.depth != 0) {

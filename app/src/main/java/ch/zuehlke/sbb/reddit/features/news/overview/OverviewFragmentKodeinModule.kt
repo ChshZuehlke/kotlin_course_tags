@@ -12,13 +12,16 @@ import com.github.salomonbrys.kodein.scopedSingleton
  * Created by celineheldner on 17.11.17.
  */
 
-fun createNewsOverviewModule(view: OverviewContract.View, listener: RedditNewsDelegateAdapter.OnNewsSelectedListener) = Kodein.Module{
+object OverviewFragmentKodeinModule{
+    fun createNewsOverviewModule(view: OverviewContract.View, listener: RedditNewsDelegateAdapter.OnNewsSelectedListener) = Kodein.Module{
 
-    bind<OverviewContract.Presenter>() with scopedSingleton(androidSupportFragmentScope){
-        OverviewPresenter(view, instance())
-    }
+        bind<OverviewContract.Presenter>() with scopedSingleton(androidSupportFragmentScope){
+            OverviewPresenter(view, instance())
+        }
 
-    bind<RedditOverviewAdapter>() with scopedSingleton(androidSupportFragmentScope){
-        RedditOverviewAdapter(listener)
+        bind<RedditOverviewAdapter>() with scopedSingleton(androidSupportFragmentScope){
+            RedditOverviewAdapter(listener)
+        }
     }
 }
+

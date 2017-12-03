@@ -12,8 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.BaseFragment
+import ch.zuehlke.sbb.reddit.features.news.detail.DetailsFragmentKodeinModule.createNewsDetailsModule
 import ch.zuehlke.sbb.reddit.features.news.overview.ScrollChildSwipeRefreshLayout
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
+
+import com.google.common.base.Preconditions.checkNotNull
+import kotlinx.android.synthetic.main.fragment_detail.*
 import com.github.salomonbrys.kodein.instance
 import com.github.salomonbrys.kodein.with
 
@@ -29,31 +33,28 @@ class DetailFragment: BaseFragment(), DetailContract.View {
     private val mPresenter: DetailContract.Presenter by injector.with(this@DetailFragment).instance()
     private val mAdapter: DetailAdapter by injector.with(this@DetailFragment).instance()
 
-    private var mPostView: RecyclerView? = null
-    private var mNoPostView: View? = null
-
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater!!.inflate(R.layout.fragment_detail, container, false)
+        return LayoutInflater.from(context).inflate(R.layout.fragment_detail,container,false)
+    }
 
-        mNoPostView = root.findViewById<View>(R.id.noRedditPostVIew)
-        mPostView = root.findViewById<RecyclerView>(R.id.redditPostView)
-        mPostView!!.layoutManager = LinearLayoutManager(context)
-        mPostView!!.adapter = mAdapter
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        // Set up progress indicator
-        val swipeRefreshLayout = root.findViewById<View>(R.id.refreshLayout) as ScrollChildSwipeRefreshLayout
-        swipeRefreshLayout.setColorSchemeColors(
-                ContextCompat.getColor(activity, R.color.colorPrimary),
-                ContextCompat.getColor(activity, R.color.colorAccent),
-                ContextCompat.getColor(activity, R.color.colorPrimaryDark)
-        )
+        redditPostView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = mAdapter
+            setHasFixedSize(true)
+        }
 
-        swipeRefreshLayout.setScrollUpChild(mPostView!!)
-        swipeRefreshLayout.setOnRefreshListener { mPresenter.loadRedditPosts() }
-
-
-        mPostView!!.setHasFixedSize(true)
-        return root
+        refreshLayout.apply {
+            setColorSchemeColors(
+                    ContextCompat.getColor(activity, R.color.colorPrimary),
+                    ContextCompat.getColor(activity, R.color.colorAccent),
+                    ContextCompat.getColor(activity, R.color.colorPrimaryDark)
+            )
+            setScrollUpChild(redditPostView)
+            setOnRefreshListener { mPresenter!!.loadRedditPosts() }
+        }
     }
 
 
@@ -78,9 +79,8 @@ class DetailFragment: BaseFragment(), DetailContract.View {
         if (view == null) {
             return
         }
-        val srl = view!!.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
         // Make sure setRefreshing() is called after the layout is done with everything else.
-        srl.post { srl.isRefreshing = isActive }
+        refreshLayout.post { refreshLayout.isRefreshing = isActive }
     }
 
     companion object {

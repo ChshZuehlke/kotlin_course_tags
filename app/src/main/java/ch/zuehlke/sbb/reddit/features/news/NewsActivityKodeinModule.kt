@@ -9,10 +9,14 @@ import com.github.salomonbrys.kodein.bind
 /**
  * Created by celineheldner on 17.11.17.
  */
-fun createNewsActivityModule(appCompatActivity: AppCompatActivity, fragmentContainerId: Int) = Kodein.Module{
 
-    bind<NavigationController>() with autoScopedSingleton(androidActivityScope){
-        NavigationController(appCompatActivity,fragmentContainerId)
+object NewsActivityKodeinModule{
+    fun createNewsActivityModule(appCompatActivity: AppCompatActivity, fragmentContainerId: Int) = Kodein.Module{
+
+        bind<NavigationController>() with autoScopedSingleton(androidActivityScope){
+            NavigationController(appCompatActivity,fragmentContainerId)
+        }
+
     }
-
 }
+
