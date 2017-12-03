@@ -1,4 +1,4 @@
-package ch.zuehlke.sbb.reddit.features.overview
+package ch.zuehlke.sbb.reddit.features.news.overview
 
 import android.support.v4.util.SparseArrayCompat
 import ch.zuehlke.sbb.reddit.R

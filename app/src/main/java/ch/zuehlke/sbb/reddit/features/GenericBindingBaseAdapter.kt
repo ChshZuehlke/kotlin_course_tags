@@ -12,8 +12,6 @@ import android.view.LayoutInflater
 
 abstract class GenericBindingBaseAdapter(val clickListener: GenericBindingViewHolder.GenericBindingClickListener) : RecyclerView.Adapter<GenericBindingViewHolder>() {
 
-
-
     override fun onBindViewHolder(holder: GenericBindingViewHolder, position: Int) {
         val itemToBind = getObjForPosition(position)
         holder.bind(itemToBind)

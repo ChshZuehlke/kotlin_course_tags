@@ -9,12 +9,8 @@ import java.io.IOException
 import java.util.ArrayList
 import java.util.Date
 
-import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIChildrenResponse
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIChildrenResponseData
 import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIResponse
-import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
@@ -22,25 +18,28 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.reflect.Type
 
 import com.google.common.base.Preconditions.checkNotNull
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import java.lang.reflect.Type
 
 /**
  * Created by chsc on 08.11.17.
  */
 
-class RedditNewsDataRemoteDataSource// Prevent direct instantiation.
-private constructor(context: Context, redditAPI: RedditAPI,private val type: Type,private val gson: Gson) : RedditDataSource {
+class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
     private var after = ""
     private var order = -1
     private val mRedditAPI: RedditAPI
+    private val mGson: Gson
+    private val mType: Type
+    private val TAG = "RemoteDataSource"
 
     init {
         checkNotNull(context)
         mRedditAPI = checkNotNull(redditAPI, "The reddit api cannot be null")
+        mGson = gson
+        mType = type
 
     }
 
@@ -102,7 +101,6 @@ private constructor(context: Context, redditAPI: RedditAPI,private val type: Typ
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 var redditPosts: List<RedditPostsData> = ArrayList()
-                val parentId: String? = null
                 val elements = parseResponseToPostElements(response.body())
                 order = 0
                 redditPosts = flattenRetrofitResponse(elements, title)
@@ -174,7 +172,7 @@ private constructor(context: Context, redditAPI: RedditAPI,private val type: Typ
     private fun parseResponseToPostElements(response: ResponseBody): List<RedditPostElement> {
         var redditPostElements: List<RedditPostElement>? = null
         try {
-            redditPostElements = gson.fromJson<List<RedditPostElement>>(response.string(), type)
+            redditPostElements = mGson.fromJson<List<RedditPostElement>>(response.string(), mType)
         } catch (e: IOException) {
            Log.e(TAG,"Error while parsing respone $e")
         }
@@ -193,19 +191,5 @@ private constructor(context: Context, redditAPI: RedditAPI,private val type: Typ
 
     override fun saveRedditNews(data: RedditNewsData) {
         // In this demo app we do not support posting of news, therefore not implemented.
-    }
-
-    companion object {
-
-        private val TAG = "RemoteDataSource"
-
-        private var INSTANCE: RedditNewsDataRemoteDataSource? = null
-
-        fun getInstance(context: Context, redditAPI: RedditAPI,gson: Gson,type: Type): RedditNewsDataRemoteDataSource {
-            if (INSTANCE == null) {
-                INSTANCE = RedditNewsDataRemoteDataSource(context, redditAPI,type,gson)
-            }
-            return INSTANCE!!
-        }
     }
 }

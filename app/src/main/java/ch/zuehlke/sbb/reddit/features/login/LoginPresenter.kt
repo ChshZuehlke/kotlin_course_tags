@@ -19,7 +19,6 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
 
     init {
         this.mLoginView = checkNotNull(view, "LoginView cannot be null")
-        view.setPresenter(this)
     }
 
     override fun start() {

@@ -1,4 +1,4 @@
-package ch.zuehlke.sbb.reddit.features.detail
+package ch.zuehlke.sbb.reddit.features.news.detail
 
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.AdapterConstants
@@ -11,9 +11,9 @@ import ch.zuehlke.sbb.reddit.models.RedditPostsData
  * Created by chsc on 15.11.17.
  */
 
-class PostAdapter(clickListener: GenericBindingViewHolder.GenericBindingClickListener) : GenericBindingBaseAdapter(clickListener){
+class DetailAdapter(clickListener: GenericBindingViewHolder.GenericBindingClickListener) : GenericBindingBaseAdapter(clickListener){
 
-    private val POST_VIEW_TYPE = object : ViewType{
+    private val POST_VIEW_TYPE = object : ViewType {
         override val viewType = AdapterConstants.POST
     }
 
