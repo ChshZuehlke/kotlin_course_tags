@@ -25,8 +25,6 @@ interface RedditDataSource {
 
     fun deletePostsWithPermaLink(permaLink: String)
 
-    fun refreshNews()
-
     fun deleteAllNews()
 
     fun saveRedditNews(data: List<RedditNewsData>)
