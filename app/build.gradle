@@ -80,6 +80,9 @@ dependencies {
     implementation "android.arch.persistence.room:rxjava2:$room_version"
     compile "io.reactivex.rxjava2:rxandroid:$rxjava_android_version"
     compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
+    compile "io.reactivex.rxjava2:rxkotlin:$rx_kotlin"
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
 
 
 
