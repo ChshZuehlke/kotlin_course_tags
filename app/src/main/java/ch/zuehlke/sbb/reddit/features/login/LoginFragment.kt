@@ -36,7 +36,7 @@ class LoginFragment : BaseFragment(), LoginContract.View {
 
     private val disposable = CompositeDisposable()
 
-    val usernameTextObservable = Observable.create(ObservableOnSubscribe<String> { emitter ->
+    private val usernameTextObservable = Observable.create(ObservableOnSubscribe<String> { emitter ->
         // Isolated callback connected to the emitter
         val textWatcher: TextWatcher = object : TextWatcher {
             override fun afterTextChanged(editable: Editable) {
@@ -59,23 +59,25 @@ class LoginFragment : BaseFragment(), LoginContract.View {
         }
     })
 
-    private val passwordListener = object : TextWatcher{
-        override fun afterTextChanged(editable: Editable) {
-            if (verifyPasswordLength(editable.toString())) {
-                password!!.error = null
-            } else {
-                password!!.error = getString(R.string.login_screen_invalid_password_length)
+    private val passwordTextObservable = Observable.create(ObservableOnSubscribe<String> { emitter ->
+        val passwordListener = object : TextWatcher{
+            override fun afterTextChanged(editable: Editable) {
+                emitter.onNext(editable.toString())
+            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                // DO nothing
+            }
+
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                // Do nothing
             }
         }
-        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-           // DO nothing
+        password.addTextChangedListener(passwordListener)
+        emitter.setCancellable {
+            password.removeTextChangedListener(passwordListener)
         }
-
-
-        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            // Do nothing
-        }
-    }
+    })
 
     override fun onResume() {
         super.onResume()
@@ -88,13 +90,15 @@ class LoginFragment : BaseFragment(), LoginContract.View {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::validateUsername))
 
-        password.addTextChangedListener(passwordListener)
+        disposable.add(passwordTextObservable
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::validatePassword));
     }
 
     override fun onPause() {
         loginButton.setOnClickListener(null)
         disposable.clear()
-        password.removeTextChangedListener(passwordListener)
 
         super.onPause()
     }
@@ -126,8 +130,7 @@ class LoginFragment : BaseFragment(), LoginContract.View {
         activity.finish()
     }
 
-
-    private fun verifyPassword(string: String) {
+    private fun validatePassword(string: String) {
         if (verifyPasswordLength(string)) {
             password!!.error = null
         } else {
@@ -151,7 +154,6 @@ class LoginFragment : BaseFragment(), LoginContract.View {
         val matcher = android.util.Patterns.EMAIL_ADDRESS.matcher(email)
         return matcher.matches()
     }
-
 
     companion object {
 
