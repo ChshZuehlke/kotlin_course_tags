@@ -1,21 +1,70 @@
 package ch.zuehlke.sbb.reddit.features.news.overview
 
 
-import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
+import ch.zuehlke.sbb.reddit.extensions.logD
+import ch.zuehlke.sbb.reddit.extensions.logE
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
-
 import com.google.common.base.Preconditions.checkNotNull
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.toSingle
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subscribers.ResourceSubscriber
 
 /**
  * Created by chsc on 11.11.17.
  */
 
-class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRepository) : OverviewContract.Presenter {
+class OverviewPresenter(
+        val view: OverviewContract.View,
+        val redditRepository: RedditRepository,
+        val mainScheduler: Scheduler = AndroidSchedulers.mainThread(),
+        val ioScheduler: Scheduler = Schedulers.io()
+) : OverviewContract.Presenter {
+
+    abstract class PageSubscriber : ResourceSubscriber<List<RedditNewsData>>() {
+        override fun onStart() {
+            nextPage()
+        }
+
+        fun nextPage() {
+            logD("Request next page")
+            request(1) // <<- Generate a single request
+        }
+    }
+
+    fun createRedditSubscriber() = object : PageSubscriber() {
+        override fun onNext(news: List<RedditNewsData>) {
+            // The view may not be able to handle UI updates anymore
+            if (mOverviewView.isActive) {
+                processTasks(news, true)
+            }
+        }
+
+        override fun onError(t: Throwable?) {
+            // The view may not be able to handle UI updates anymore
+            logE("Error on subscription: $t")
+            if (mOverviewView.isActive) {
+                mOverviewView.showRedditNewsLoadingError()
+            }
+        }
+
+        override fun onComplete() {
+            logD("Reddit subscription was completed")
+        }
+
+    }
+
 
     private val mOverviewView: OverviewContract.View
     private var mFirstLoad = true
     private val mRedditRepository: RedditRepository
+    private var currentSubscription: PageSubscriber? = null
+    private val disposable = CompositeDisposable()
+
 
     init {
         mOverviewView = checkNotNull(view, "OverviewView cannot be null")
@@ -26,11 +75,14 @@ class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRep
         loadRedditNews(false)
     }
 
+    override fun stop() {
+        disposable.clear()
+    }
+
     override fun loadRedditNews(forceUpdate: Boolean) {
         // Simplification for sample: a network reload will be forced on first load.
         loadRedditNews(forceUpdate || mFirstLoad, true)
         mFirstLoad = false
-
     }
 
 
@@ -41,55 +93,36 @@ class OverviewPresenter(view: OverviewContract.View, redditRepository: RedditRep
 
 
     override fun loadMoreRedditNews() {
-        mRedditRepository.getMoreNews(object : RedditDataSource.LoadNewsCallback {
-            override fun onNewsLoaded(news: List<RedditNewsData>) {
-                // The view may not be able to handle UI updates anymore
-                if (!mOverviewView.isActive) {
-                    return
-                }
-                processTasks(news, true)
-            }
-
-            override fun onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mOverviewView.isActive) {
-                    return
-                }
-                mOverviewView.showRedditNewsLoadingError()
-            }
-        })
-
+        loadRedditNews(false, true)
     }
 
     private fun loadRedditNews(forceUpdate: Boolean, showLoadingUI: Boolean) {
         if (showLoadingUI) {
             mOverviewView.setLoadingIndicator(true)
         }
-        if (forceUpdate) {
-            mRedditRepository.refreshNews()
+        val subscription = currentSubscription
+
+        val news = mRedditRepository.news
+                .subscribeOn(ioScheduler)
+                .observeOn(mainScheduler, false, 1)
+        if (forceUpdate || subscription == null) {
+            logD("Create new subscription")
+            subscription?.let {
+                it.dispose()
+                disposable.remove(it)
+            }
+            currentSubscription = createRedditSubscriber()
+            news.subscribeWith(currentSubscription)
+        } else {
+            subscription.nextPage()
         }
-
-        mRedditRepository.getNews(object : RedditDataSource.LoadNewsCallback {
-            override fun onNewsLoaded(news: List<RedditNewsData>) {
-                // The view may not be able to handle UI updates anymore
-                if (!mOverviewView.isActive) {
-                    return
-                }
-                if (showLoadingUI) {
-                    mOverviewView.setLoadingIndicator(false)
-                }
-
-                processTasks(news, false)
-            }
-
-            override fun onDataNotAvailable() {
-                // The view may not be able to handle UI updates anymore
-                if (!mOverviewView.isActive) {
-                    return
-                }
-                mOverviewView.showRedditNewsLoadingError()
-            }
-        })
+        if (showLoadingUI) {
+            disposable.add(
+                    news.toSingle().subscribeBy {
+                        mOverviewView.setLoadingIndicator(false)
+                    }
+            )
+        }
     }
 
     private fun processTasks(news: List<RedditNewsData>, added: Boolean) {
