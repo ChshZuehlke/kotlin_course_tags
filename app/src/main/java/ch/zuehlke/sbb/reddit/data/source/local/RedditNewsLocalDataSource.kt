@@ -6,6 +6,7 @@ import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import com.google.common.base.Preconditions.checkNotNull
 import de.dabotz.shoppinglist.database.AppDatabase
+import io.reactivex.Flowable
 
 /**
  * Created by chsc on 08.11.17.
@@ -20,23 +21,7 @@ class RedditNewsLocalDataSource constructor(context: Context, db: AppDatabase) :
         mDb = db
     }
 
-    override fun getMoreNews(callback: RedditDataSource.LoadNewsCallback) {
-        throw UnsupportedOperationException("Not supported by local datasource")
-    }
-
-    override fun getNews(callback: RedditDataSource.LoadNewsCallback) {
-        val redditNewsAccessor = AsyncDBAccessor<List<RedditNewsData>>(
-                {mDb.redditNewsDataDao().getNews()},
-                {result->
-                    if (result.isEmpty()) {
-                        // This will be called if the table is new or just empty.
-                        callback.onDataNotAvailable()
-                    } else {
-                        callback.onNewsLoaded(result)
-                    }
-        })
-        redditNewsAccessor.execute()
-    }
+    override val news: Flowable<List<RedditNewsData>> = mDb.redditNewsDataDao().getNews().toFlowable()
 
     override fun getPosts(callback: RedditDataSource.LoadPostsCallback, permalink: String) {
         val redditPostsAccessor = AsyncDBAccessor<List<RedditPostsData>>(

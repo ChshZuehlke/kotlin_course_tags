@@ -4,6 +4,7 @@ import android.content.Context
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIResponse
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
+import ch.zuehlke.sbb.reddit.extensions.logD
 import ch.zuehlke.sbb.reddit.extensions.logE
 import ch.zuehlke.sbb.reddit.extensions.logI
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
@@ -11,6 +12,11 @@ import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.base.Strings
 import com.google.gson.Gson
+import io.reactivex.Emitter
+import io.reactivex.Flowable
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxkotlin.subscribeBy
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -23,7 +29,7 @@ import java.util.*
  * Created by chsc on 08.11.17.
  */
 
-class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
+class RedditNewsDataRemoteDataSource (context: Context, redditAPI: RedditAPI, gson: Gson, type: Type, val ioScheduler: Scheduler = Schedulers.io()) : RedditDataSource {
     private var after = ""
     private var order = -1
     private val mRedditAPI: RedditAPI
@@ -39,57 +45,43 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
 
     }
 
+    override val news: Flowable<List<RedditNewsData>> = Flowable.generate(
+            fun(): String {
+                return ""
+            },
+            fun(next: String, emitter: Emitter<List<RedditNewsData>>): String {
 
-    override fun getMoreNews(callback: RedditDataSource.LoadNewsCallback) {
-        val call = mRedditAPI.getSortedNews("hot", after, "10")
-        call.enqueue(object : Callback<RedditNewsAPIResponse> {
-            override fun onResponse(call: Call<RedditNewsAPIResponse>, response: Response<RedditNewsAPIResponse>) {
-                after = response.body().data!!.after!!
-                logI("Recieved reddit response: " + response.body())
-                val redditNewsDataList = ArrayList<RedditNewsData>()
-                for (child in response.body().data!!.children!!) {
-                    val data = child.data
-                    logI("child date: " + Date(data!!.created))
-                    data?.let {
-                        redditNewsDataList.add(RedditNewsData(data.author!!, data.title!!, data.num_comments, data.created, data.thumbnail!!, data.url!!, data.id!!, data.permalink!!))
+                val newsRequest = redditAPI.getSortedNews("hot", next, "10")
+                                .map { response ->
+                                    val newsList = response.data?.children?.map { child ->
+                                        child.data?.let { data ->
+                                            RedditNewsData(data.author, data.title, data.num_comments, data.created, data.thumbnail, data.url, data.id!!, data.permalink!!)
+                                        }
+                                    } ?: emptyList()
+                                    Pair(newsList, response.data?.after)
+                                }
 
-                    }
-                     }
-                callback.onNewsLoaded(redditNewsDataList)
-            }
-
-            override fun onFailure(call: Call<RedditNewsAPIResponse>, t: Throwable) {
-                logE("Error while requesting reddit news: $t")
-                callback.onDataNotAvailable()
-            }
-        })
-    }
-
-    override fun getNews(callback: RedditDataSource.LoadNewsCallback) {
+                newsRequest.subscribeOn(ioScheduler).subscribeBy(
+                        onSuccess = { (news, _) ->
+                            logD("Received page")
+                            emitter.onNext(news.mapNotNull { it })
+                        },
+                        onError = { error ->
+                            logE("Problem when receiving page: $error")
+                            emitter.onError(error)
+                        }
+                )
 
 
-        val call = mRedditAPI.getSortedNews("hot", "", "10")
-        call.enqueue(object : Callback<RedditNewsAPIResponse> {
-            override fun onResponse(call: Call<RedditNewsAPIResponse>, response: Response<RedditNewsAPIResponse>) {
-                after = response.body().data!!.after!!
-                logI("Recieved reddit response: ${response.body()}")
-                val redditNewsDataList = ArrayList<RedditNewsData>()
-                for (child in response.body().data!!.children!!) {
-                    val data = child.data
-                    data?.let {
-                        redditNewsDataList.add(RedditNewsData(data.author!!, data.title!!, data.num_comments, data.created, data.thumbnail!!, data.url!!, data.id!!, data.permalink!!))
-                    }
-
+                try {
+                    return newsRequest.blockingGet().second ?: ""
+                } catch (error: Exception) {
+                    logE("Problem when receiving the next pages tag: $error")
+                    emitter.onError(error);
+                    return ""
                 }
-                callback.onNewsLoaded(redditNewsDataList)
             }
-
-            override fun onFailure(call: Call<RedditNewsAPIResponse>, t: Throwable) {
-                logE("Error while requesting reddit news: $t"  )
-                callback.onDataNotAvailable()
-            }
-        })
-    }
+    )
 
     override fun getPosts(callback: RedditDataSource.LoadPostsCallback, title: String) {
         val call = mRedditAPI.getRedditPosts(title, "new")
@@ -97,7 +89,7 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 var redditPosts: List<RedditPostsData> = ArrayList()
-                val elements = parseResponseToPostElements(response.body())
+                val elements = parseResponseToPostElements(response.body()!!)
                 order = 0
                 redditPosts = flattenRetrofitResponse(elements, title)
                 callback.onPostsLoaded(redditPosts)

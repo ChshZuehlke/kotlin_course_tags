@@ -6,6 +6,7 @@ import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
+import io.reactivex.Single
 
 /**
  * Created by celineheldner on 16.11.17.
@@ -15,7 +16,7 @@ interface RedditNewsDataDao{
 
 
     @Query("select * from RedditNewsData")
-    fun getNews(): List<RedditNewsData>
+    fun getNews(): Single<List<RedditNewsData>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addNewsItem(item: List<RedditNewsData>)

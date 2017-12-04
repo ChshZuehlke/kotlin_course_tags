@@ -1,6 +1,7 @@
 package ch.zuehlke.sbb.reddit.data.source.remote
 
 import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIResponse
+import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
@@ -15,7 +16,7 @@ interface RedditAPI {
 
     @GET("{sortOrder}.json")
     fun getSortedNews(@Path("sortOrder") sortOrder: String, @Query("after") after: String,
-                      @Query("limit") limit: String): Call<RedditNewsAPIResponse>
+                      @Query("limit") limit: String): Single<RedditNewsAPIResponse>
 
 
     @GET("/comments/{title}.json")
