@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.BaseFragment
 import ch.zuehlke.sbb.reddit.features.login.LoginActivityKodeinModule.createLoginModule
@@ -123,6 +124,12 @@ class LoginFragment : BaseFragment(), LoginContract.View {
         password.error = getString(R.string.login_screen_invalid_password)
     }
 
+    override fun showInvalidPasswordTimeout(secondsToWait: Int) {
+        Toast.makeText(view!!.context,
+                resources.getString(R.string.login_screen_invalid_password_timeout, secondsToWait),
+                Toast.LENGTH_SHORT
+        ).show();
+    }
 
     override fun showRedditNews() {
         val intent = Intent(context, NewsActivity::class.java)
