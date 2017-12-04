@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import ch.zuehlke.sbb.reddit.R
+import ch.zuehlke.sbb.reddit.extensions.logD
 import ch.zuehlke.sbb.reddit.features.BaseFragment
 import ch.zuehlke.sbb.reddit.features.news.NavigationController
 import ch.zuehlke.sbb.reddit.features.news.overview.OverviewFragmentKodeinModule.createNewsOverviewModule
@@ -54,7 +55,8 @@ class OverviewFragment : BaseFragment(), OverviewContract.View {
 
         val infiniteScrollListener = object : InfiniteScrollListener(redditNewsView.layoutManager as LinearLayoutManager) {
             override fun loadingFunction() {
-                mOverviewPresenter!!.loadMoreRedditNews()
+                logD("Load more reddit news")
+                mOverviewPresenter.loadMoreRedditNews()
             }
         }
 
@@ -70,7 +72,8 @@ class OverviewFragment : BaseFragment(), OverviewContract.View {
             setScrollUpChild(redditNewsView)
             setOnRefreshListener {
                 infiniteScrollListener.reset()
-                mOverviewPresenter?.loadRedditNews(false)
+                mOverviewAdapter.clear()
+                mOverviewPresenter.loadRedditNews(true)
             }
         }
     }
@@ -78,6 +81,11 @@ class OverviewFragment : BaseFragment(), OverviewContract.View {
     override fun onResume() {
         super.onResume()
         mOverviewPresenter.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mOverviewPresenter.stop()
     }
 
 
@@ -93,7 +101,8 @@ class OverviewFragment : BaseFragment(), OverviewContract.View {
     }
 
     override fun showRedditNews(redditNews: List<RedditNewsData>) {
-        mOverviewAdapter!!.clearAndAddNews(redditNews)
+        mOverviewAdapter.clear()
+        mOverviewAdapter.addRedditNews(redditNews)
         redditNewsView!!.visibility = View.VISIBLE
         noRedditNewsView!!.visibility = View.GONE
     }
@@ -105,7 +114,6 @@ class OverviewFragment : BaseFragment(), OverviewContract.View {
     override fun showRedditNewsLoadingError() {
         Snackbar.make(view!!, R.string.overview_screen_error_loading_reddit_news, Snackbar.LENGTH_LONG)
     }
-
 
     override fun showNoNews() {
         redditNewsView.visibility = View.GONE

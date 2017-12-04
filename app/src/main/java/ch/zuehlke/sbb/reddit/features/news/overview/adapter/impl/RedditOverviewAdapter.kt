@@ -2,14 +2,11 @@ package ch.zuehlke.sbb.reddit.features.news.overview.adapter.impl
 
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
-
-import java.util.ArrayList
-import java.util.HashMap
-
 import ch.zuehlke.sbb.reddit.features.news.overview.adapter.AdapterConstants
 import ch.zuehlke.sbb.reddit.features.news.overview.adapter.ViewType
 import ch.zuehlke.sbb.reddit.features.news.overview.adapter.ViewTypeDelegateAdapter
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
+import java.util.*
 
 /**
  * Created by chsc on 12.11.17.
@@ -40,16 +37,11 @@ class RedditOverviewAdapter(listener: RedditNewsDelegateAdapter.OnNewsSelectedLi
         notifyItemRangeChanged(initPosition, mItems.size + 1 /* plus loading item */)
     }
 
-    fun clearAndAddNews(newsData: List<RedditNewsData>) {
-        val previousItemSize = mItems.size
+    fun clear(){
+        notifyItemRangeRemoved(0, mItems.size)
         mItems.clear()
-        notifyItemRangeRemoved(0, previousItemSize)
-        mItems.addAll(newsData)
         mItems.add(loadingItem)
-        notifyItemRangeChanged(0, newsData.size + 1 /* plus loading item */)
-
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return adapters[viewType]!!.onCreateViewHolder(parent)
