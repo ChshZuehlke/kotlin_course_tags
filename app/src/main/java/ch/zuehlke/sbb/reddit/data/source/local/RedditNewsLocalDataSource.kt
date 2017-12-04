@@ -52,11 +52,6 @@ class RedditNewsLocalDataSource constructor(context: Context, db: AppDatabase) :
 
     }
 
-    override fun refreshNews() {
-        // Not required because the {@link RedditRepository} handles the logic of refreshing the
-        // news from all the available redditPost sources.
-    }
-
     override fun deleteAllNews() {
         AsyncDBAccessor({
         mDb.redditNewsDataDao().deleteNews()},{}).execute()

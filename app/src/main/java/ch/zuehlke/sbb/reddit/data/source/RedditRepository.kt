@@ -37,9 +37,10 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
         mRedditNewsLocalDataSource = checkNotNull(newsLocalDataSource)
     }
 
-    override val news: Flowable<List<RedditNewsData>> = Flowable.concat(
-            mRedditNewsLocalDataSource.news, mRedditNewsRemoteDataSource.news
-    ).cache()
+    override val news: Flowable<List<RedditNewsData>> = Flowable.concatEager(
+            listOf(mRedditNewsLocalDataSource.news, mRedditNewsRemoteDataSource.news),
+            1, 1
+    ).replay().autoConnect()
 
     override fun getPosts(callback: RedditDataSource.LoadPostsCallback, permalink: String) {
         val convertedPermaLink = convertURLToRemote(permalink)
@@ -79,11 +80,6 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
 
     override fun deletePostsWithPermaLink(permaLink: String) {
 
-    }
-
-    override fun refreshNews() {
-        mCacheIsDirty = true
-        mRedditNewsRemoteDataSource.refreshNews()
     }
 
     override fun deleteAllNews() {
