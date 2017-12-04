@@ -1,8 +1,10 @@
 package ch.zuehlke.sbb.reddit.features.login
 
-import android.os.AsyncTask
-import android.os.Handler
 import com.google.common.base.Preconditions.checkNotNull
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by chsc on 08.11.17.
@@ -28,32 +30,28 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
     override fun login(userEmail: String, password: String) {
         mLoginView.setLoadingIndicator(true)
         // Simulate a 'long' network call to verify the credentials
-        Handler().postDelayed({
-            object : AsyncTask<Void, Void, Void>() {
-                public override fun doInBackground(vararg voids: Void): Void? {
-                    if (mLoginView.isActive) {
 
-                        var hasError = false
-                        if (userEmail != "test.tester@test.com") {
-                            mLoginView.showInvalidUsername()
-                            hasError = true
-                        }
+        launch(UI) {
+            delay(1000, TimeUnit.MILLISECONDS)
+            if (mLoginView.isActive) {
 
-                        if (password != "123456") {
-                            mLoginView.showInvalidPassword()
-                            hasError = true
-                        }
-
-                        if (!hasError) {
-                            mLoginView.showRedditNews()
-                        }
-                        mLoginView.setLoadingIndicator(false)
-                    }
-                    return null
+                var hasError = false
+                if (userEmail != "test.tester@test.com") {
+                    mLoginView.showInvalidUsername()
+                    hasError = true
                 }
-            }.doInBackground()
-        }, 1000)
 
+                if (password != "123456") {
+                    mLoginView.showInvalidPassword()
+                    hasError = true
+                }
+
+                if (!hasError) {
+                    mLoginView.showRedditNews()
+                }
+                mLoginView.setLoadingIndicator(false)
+            }
+        }
     }
 
 
