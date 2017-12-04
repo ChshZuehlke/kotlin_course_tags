@@ -2,10 +2,6 @@ package ch.zuehlke.sbb.reddit.features.login
 
 import android.os.AsyncTask
 import android.os.Handler
-
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 import com.google.common.base.Preconditions.checkNotNull
 
 /**
@@ -22,6 +18,10 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
     }
 
     override fun start() {
+        // Do nothing here, as we don't load any redditPost
+    }
+
+    override fun stop() {
         // Do nothing here, as we don't load any redditPost
     }
 

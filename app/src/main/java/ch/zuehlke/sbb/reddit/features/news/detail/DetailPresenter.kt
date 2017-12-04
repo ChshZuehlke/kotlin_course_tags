@@ -26,7 +26,9 @@ class DetailPresenter(detailView: DetailContract.View, repository: RedditReposit
         loadRedditPosts()
     }
 
-
+    override fun stop() {
+        // Nothing to do
+    }
 
     override fun loadRedditPosts() {
         if (mDetailView.isActive) {

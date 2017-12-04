@@ -7,4 +7,6 @@ package ch.zuehlke.sbb.reddit
 interface BasePresenter {
 
     fun start()
+
+    fun stop()
 }
