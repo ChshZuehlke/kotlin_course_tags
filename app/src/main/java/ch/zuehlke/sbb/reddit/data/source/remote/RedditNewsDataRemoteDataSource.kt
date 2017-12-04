@@ -2,11 +2,9 @@ package ch.zuehlke.sbb.reddit.data.source.remote
 
 import android.content.Context
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
-import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIResponse
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import ch.zuehlke.sbb.reddit.extensions.logD
 import ch.zuehlke.sbb.reddit.extensions.logE
-import ch.zuehlke.sbb.reddit.extensions.logI
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import com.google.common.base.Preconditions.checkNotNull
@@ -16,26 +14,18 @@ import io.reactivex.Emitter
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.rxkotlin.subscribeBy
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 import java.lang.reflect.Type
-import java.util.*
 
-/**
- * Created by chsc on 08.11.17.
- */
-
-class RedditNewsDataRemoteDataSource (context: Context, redditAPI: RedditAPI, gson: Gson, type: Type, val ioScheduler: Scheduler = Schedulers.io()) : RedditDataSource {
-    private var after = ""
+class RedditNewsDataRemoteDataSource(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type, val ioScheduler: Scheduler = Schedulers.io()) : RedditDataSource {
     private var order = -1
     private val mRedditAPI: RedditAPI
     private val mGson: Gson
     private val mType: Type
-    private val TAG = "RemoteDataSource"
 
     init {
         checkNotNull(context)
@@ -47,36 +37,23 @@ class RedditNewsDataRemoteDataSource (context: Context, redditAPI: RedditAPI, gs
 
     override val news: Flowable<List<RedditNewsData>> = Flowable.generate(
             fun(): String {
+                logD("New subscription, starting with tag \"\"")
                 return ""
             },
-            fun(next: String, emitter: Emitter<List<RedditNewsData>>): String {
-
-                val newsRequest = redditAPI.getSortedNews("hot", next, "10")
-                                .map { response ->
-                                    val newsList = response.data?.children?.map { child ->
-                                        child.data?.let { data ->
-                                            RedditNewsData(data.author, data.title, data.num_comments, data.created, data.thumbnail, data.url, data.id!!, data.permalink!!)
-                                        }
-                                    } ?: emptyList()
-                                    Pair(newsList, response.data?.after)
-                                }
-
-                newsRequest.subscribeOn(ioScheduler).subscribeBy(
-                        onSuccess = { (news, _) ->
-                            logD("Received page")
-                            emitter.onNext(news.mapNotNull { it })
-                        },
-                        onError = { error ->
-                            logE("Problem when receiving page: $error")
-                            emitter.onError(error)
-                        }
-                )
-
-
+            fun(currentTag: String, emitter: Emitter<List<RedditNewsData>>): String {
                 try {
-                    return newsRequest.blockingGet().second ?: ""
+                    val response = redditAPI.getSortedNews("hot", currentTag, "10").execute().body()
+                    val newsList = response?.data?.children?.map { child ->
+                        child.data?.let { data ->
+                            RedditNewsData(data.author, data.title, data.num_comments, data.created, data.thumbnail, data.url, data.id!!, data.permalink!!)
+                        }
+                    } ?: emptyList()
+                    val nextTag = response?.data?.after ?: ""
+                    logD("Received page $currentTag, next is $nextTag")
+                    emitter.onNext(newsList.mapNotNull { it })
+                    return nextTag
                 } catch (error: Exception) {
-                    logE("Problem when receiving the next pages tag: $error")
+                    logE("Problem when receiving the currentTag pages tag: $error")
                     emitter.onError(error);
                     return ""
                 }
@@ -103,7 +80,7 @@ class RedditNewsDataRemoteDataSource (context: Context, redditAPI: RedditAPI, gs
     }
 
     override fun savePosts(data: List<RedditPostsData>) {
-        //Remotly its not used
+        //Remotely its not used
     }
 
     override fun deletePostsWithPermaLink(permaLink: String) {
@@ -167,10 +144,6 @@ class RedditNewsDataRemoteDataSource (context: Context, redditAPI: RedditAPI, gs
 
         return redditPostElements!!
 
-    }
-
-    override fun refreshNews() {
-        after = ""
     }
 
     override fun deleteAllNews() {
