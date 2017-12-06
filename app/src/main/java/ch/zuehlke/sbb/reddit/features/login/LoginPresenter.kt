@@ -36,6 +36,7 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
             if (mLoginView.isActive) {
 
                 var hasError = false
+                // Validate the username asynchrounous - use async
                 if (userEmail != "test.tester@test.com") {
                     mLoginView.showInvalidUsername()
                     hasError = true
