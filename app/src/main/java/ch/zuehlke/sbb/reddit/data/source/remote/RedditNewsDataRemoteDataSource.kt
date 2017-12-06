@@ -120,15 +120,15 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
 
     private fun flattenRetrofitResponse(response: List<RedditPostElement>, parentPermaLink: String): List<RedditPostsData> {
         val flatten = ArrayList<RedditPostsData>()
-        for (redditPostElement in response) {
-            if (redditPostElement is RedditPostElement.DataRedditPostElement) {
+        for (redditPostElement in response) { // Use map for this loop
+            if (redditPostElement is RedditPostElement.DataRedditPostElement) { // Use filter instead of this if
                 val dataElement = redditPostElement
                 val data = dataElement.data
                 if (dataElement.data != null) {
                     if (!Strings.isNullOrEmpty(dataElement.data.body_html)) {
                         data?.let {
                             val postData = RedditPostsData(data.id!!, null, data.author!!, data.body!!, data.created_utc, data.depth, data.body_html!!, data.permalink!!, order++.toLong())
-                            flatten.add(postData)
+                            flatten.add(postData) // Use flatMap instead off
                         }
 
                     } else {
@@ -145,15 +145,15 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
 
     private fun recursivlyParseResponse(dataRedditPostElement: RedditPostElement.DataRedditPostElement, parentId: String?, parentPermaLink: String): List<RedditPostsData> {
         val posts = ArrayList<RedditPostsData>()
-        for (child in dataRedditPostElement.data!!.children!!) {
-            if (child is RedditPostElement.DataRedditPostElement) {
+        for (child in dataRedditPostElement.data!!.children!!) { // Use map for this
+            if (child is RedditPostElement.DataRedditPostElement) { // Use filter for this
                 val data = child.data
                 if (data != null) {
                     data?.let {
                         val postData = RedditPostsData(data.id!!, parentId, data.author, data.body, data.created_utc, data.depth, data.body_html, parentPermaLink, order++.toLong())
                         posts.add(postData)
                         if (data.replies != null && data.replies is RedditPostElement.DataRedditPostElement) {
-                            posts.addAll(recursivlyParseResponse(data.replies as RedditPostElement.DataRedditPostElement, data.id!!, parentPermaLink))
+                            posts.addAll(recursivlyParseResponse(data.replies as RedditPostElement.DataRedditPostElement, data.id!!, parentPermaLink)) // Use flatMap for this
                         }
                     }
 
