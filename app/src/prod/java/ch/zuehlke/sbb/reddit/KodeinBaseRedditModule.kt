@@ -60,7 +60,7 @@ fun createBaseModule(context: Context) = Kodein.Module{
      * the RedditRepository does not need to be implemented as a singleton -> Kodein can handle that
      * Retrievs the two DataSource-Instances bound previously using a tag
      */
-    bind<RedditRepository>() with eagerSingleton {
+    bind<RedditRepository>() with singleton {
         RedditRepository(
                 instance("remoteDS"),
                 instance("localDS"),
