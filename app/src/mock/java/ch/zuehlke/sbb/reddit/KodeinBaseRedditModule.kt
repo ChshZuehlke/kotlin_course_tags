@@ -25,7 +25,7 @@ fun createBaseModule(context: Context) = Kodein.Module{
                 .create()
     }
 
-    bind<RedditRepository>() with eagerSingleton {
+    bind<RedditRepository>() with singleton {
                 RedditRepository(
                         FakeRedditNewsRemoteDataSource(),
                         RedditNewsLocalDataSource(context),
