@@ -3,10 +3,8 @@ package ch.zuehlke.sbb.reddit.features.overview
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.data.FakeRedditNewsRemoteDataSource
-import ch.zuehlke.sbb.reddit.data.source.RedditRepository
-import ch.zuehlke.sbb.reddit.data.source.local.RedditNewsLocalDataSource
 import ch.zuehlke.sbb.reddit.util.ActivityUtils
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.ActivityInjector
@@ -48,8 +46,7 @@ class OverviewActivity : AppCompatActivity(), ActivityInjector {
 
         //TODO: kodein_exercise1: entferne diese Variable 'redditRepository' hier und benutze die oben von Kodein instanzierte!
 
-        val redditRepository = RedditRepository.getInstance(FakeRedditNewsRemoteDataSource.getInstance(),
-                RedditNewsLocalDataSource.getInstance(this), this)
+        val redditRepository = Injection.provideRedditNewsRepository(this)
 
         // Create the presenter
         mOverviewPresenter = OverviewPresenter(overviewFragment, redditRepository)

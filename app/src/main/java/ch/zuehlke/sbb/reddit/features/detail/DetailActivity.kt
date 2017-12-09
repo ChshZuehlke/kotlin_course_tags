@@ -4,15 +4,13 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import ch.zuehlke.sbb.reddit.Injection
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.data.FakeRedditNewsRemoteDataSource
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
 import ch.zuehlke.sbb.reddit.data.source.local.RedditNewsLocalDataSource
-import ch.zuehlke.sbb.reddit.data.source.remote.RedditNewsDataRemoteDataSource
 import ch.zuehlke.sbb.reddit.util.ActivityUtils
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.ActivityInjector
-import com.github.salomonbrys.kodein.instance
 
 
 /**
@@ -41,7 +39,6 @@ class DetailActivity : AppCompatActivity(), ActivityInjector {
         ab!!.setDisplayHomeAsUpEnabled(false)
 
 
-
         val redditUrl = intent.getStringExtra(EXTRA_REDDIT_NEWS_URL)
         Log.i(TAG, "RedditUrl: " + redditUrl)
         var detailFragment: DetailFragment? = supportFragmentManager.findFragmentById(R.id.contentFrame) as DetailFragment?
@@ -54,7 +51,7 @@ class DetailActivity : AppCompatActivity(), ActivityInjector {
 
         //TODO: kodein_exercise1: entferne diese Variable und benutze die oben von Kodein instanzierte!
 
-        val redditRepository = RedditRepository.getInstance(FakeRedditNewsRemoteDataSource.getInstance(),
+        val redditRepository = RedditRepository.getInstance(Injection.provideRedditNewsRepository(this),
                 RedditNewsLocalDataSource.getInstance(this), this)
 
         // Create the presenter
@@ -66,7 +63,7 @@ class DetailActivity : AppCompatActivity(), ActivityInjector {
         destroyInjector()
     }
 
-        companion object {
+    companion object {
 
         val EXTRA_REDDIT_NEWS_URL = "redditNewsUrl"
         private val TAG = "DetailActivity"
