@@ -78,6 +78,8 @@ dependencies {
     kapt "android.arch.persistence.room:compiler:$room_version"
     // RxJava support for Room
     implementation "android.arch.persistence.room:rxjava2:$room_version"
+    compile "io.reactivex.rxjava2:rxandroid:$rxjava_android_version"
+    compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
 
 
 
