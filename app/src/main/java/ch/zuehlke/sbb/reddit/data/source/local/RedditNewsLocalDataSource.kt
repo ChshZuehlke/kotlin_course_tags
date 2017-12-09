@@ -17,9 +17,21 @@ import com.google.common.base.Preconditions.checkNotNull
  * Created by chsc on 08.11.17.
  */
 
-class RedditNewsLocalDataSource constructor(context: Context) : RedditDataSource {
+class RedditNewsLocalDataSource private constructor(context: Context) : RedditDataSource {
 
     private val mDbHelper: RedditNewsDataHelper
+
+    companion object {
+
+        private var INSTANCE: RedditNewsLocalDataSource? = null
+
+        fun getInstance(context: Context): RedditNewsLocalDataSource {
+            if (INSTANCE == null) {
+                INSTANCE = RedditNewsLocalDataSource(context)
+            }
+            return INSTANCE!!
+        }
+    }
 
     init {
         checkNotNull(context)

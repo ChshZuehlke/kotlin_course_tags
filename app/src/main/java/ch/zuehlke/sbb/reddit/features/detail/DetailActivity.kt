@@ -5,7 +5,9 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import ch.zuehlke.sbb.reddit.R
+import ch.zuehlke.sbb.reddit.data.FakeRedditNewsRemoteDataSource
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
+import ch.zuehlke.sbb.reddit.data.source.local.RedditNewsLocalDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.RedditNewsDataRemoteDataSource
 import ch.zuehlke.sbb.reddit.util.ActivityUtils
 import com.github.salomonbrys.kodein.KodeinInjector
@@ -22,7 +24,6 @@ class DetailActivity : AppCompatActivity(), ActivityInjector {
     override val injector: KodeinInjector = KodeinInjector()
 
     //TODO: kodein_exercise1: Benutze Kodein um das RedditRepository abzurufen.
-
 
     private var mOverviewPresenter: DetailPresenter? = null
 
@@ -50,6 +51,11 @@ class DetailActivity : AppCompatActivity(), ActivityInjector {
             ActivityUtils.addFragmentToActivity(
                     supportFragmentManager, detailFragment, R.id.contentFrame)
         }
+
+        //TODO: kodein_exercise1: entferne diese Variable und benutze die oben von Kodein instanzierte!
+
+        val redditRepository = RedditRepository.getInstance(FakeRedditNewsRemoteDataSource.getInstance(),
+                RedditNewsLocalDataSource.getInstance(this), this)
 
         // Create the presenter
         mOverviewPresenter = DetailPresenter(detailFragment, redditRepository, redditUrl)

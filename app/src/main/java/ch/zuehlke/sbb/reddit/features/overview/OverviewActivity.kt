@@ -4,11 +4,12 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import ch.zuehlke.sbb.reddit.R
+import ch.zuehlke.sbb.reddit.data.FakeRedditNewsRemoteDataSource
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
+import ch.zuehlke.sbb.reddit.data.source.local.RedditNewsLocalDataSource
 import ch.zuehlke.sbb.reddit.util.ActivityUtils
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.ActivityInjector
-import com.github.salomonbrys.kodein.instance
 
 /**
  * Created by chsc on 11.11.17.
@@ -19,7 +20,6 @@ class OverviewActivity : AppCompatActivity(), ActivityInjector {
     override val injector: KodeinInjector = KodeinInjector()
 
     //TODO: kodein_exercise1: Benutze Kodein um das RedditRepository abzurufen.
-    val redditRepository: RedditRepository by instance()
 
     private var mOverviewPresenter: OverviewPresenter? = null
 
@@ -27,7 +27,9 @@ class OverviewActivity : AppCompatActivity(), ActivityInjector {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Kodein Injector wird initialisiert
         initializeInjector()
+
         setContentView(R.layout.activity_overview)
 
         // Set up the toolbar.
@@ -43,6 +45,11 @@ class OverviewActivity : AppCompatActivity(), ActivityInjector {
             ActivityUtils.addFragmentToActivity(
                     supportFragmentManager, overviewFragment!!, R.id.contentFrame)
         }
+
+        //TODO: kodein_exercise1: entferne diese Variable 'redditRepository' hier und benutze die oben von Kodein instanzierte!
+
+        val redditRepository = RedditRepository.getInstance(FakeRedditNewsRemoteDataSource.getInstance(),
+                RedditNewsLocalDataSource.getInstance(this), this)
 
         // Create the presenter
         mOverviewPresenter = OverviewPresenter(overviewFragment, redditRepository)

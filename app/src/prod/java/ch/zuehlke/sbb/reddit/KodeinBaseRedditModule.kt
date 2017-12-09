@@ -48,24 +48,17 @@ fun createBaseModule(context: Context) = Kodein.Module{
                 .create()
     }
 
-    /**
-     * The Datasources don't need to be implemented as singletons anymore. Kodein can handle that
-     * Binding the two Datasources as Singletons
-     * Needs Tagging to differentiate the instances
-     */
-    bind<RedditDataSource>("remoteDS") with singleton { RedditNewsDataRemoteDataSource(context, instance(),instance(), type) }
-    bind<RedditDataSource>("localDS") with singleton { RedditNewsLocalDataSource(context) }
 
-    /**
-     * the RedditRepository does not need to be implemented as a singleton -> Kodein can handle that
-     * Retrievs the two DataSource-Instances bound previously using a tag
+    /*
+    TODO: kodein_exercise1:  Binde die beiden "RedditDataSource": "RedditNewsDataRemoteDataSource" und "RedditNewsLocalDataSource" als Singletons.
+    TODO: kodein_exercise1:  Hint: Tagging und Transitive Abhängigkeiten werden benötigt
      */
-    bind<RedditRepository>() with singleton {
-        RedditRepository(
-                instance("remoteDS"),
-                instance("localDS"),
-                context)
-    }
+
+
+    /*
+    TODO: kodein_exercise1:  Binde das "RedditRepository"
+    TODO: kodein_exercise1:  Hint: Tagging und Transitive Abhängigkeiten werden benötigt
+     */
 
 
 }

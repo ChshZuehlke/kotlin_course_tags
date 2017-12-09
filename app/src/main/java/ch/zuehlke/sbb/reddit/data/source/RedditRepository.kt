@@ -16,7 +16,10 @@ import com.google.common.base.Preconditions.checkNotNull
  * Created by chsc on 08.11.17.
  */
 
-class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
+
+//TODO: kodein_exercise1: Verändere diese Klasse, so dass sie direkt instanziert werden kann. Entferne die Singleton Implementation
+
+class RedditRepository private constructor(newsRemoteDataSource: RedditDataSource,
                     newsLocalDataSource: RedditDataSource, private val mContext: Context) : RedditDataSource {
 
     private val mRedditNewsRemoteDataSource: RedditDataSource
@@ -35,6 +38,27 @@ class RedditRepository constructor(newsRemoteDataSource: RedditDataSource,
      * has package local visibility so it can be accessed from tests.
      */
     internal var mCacheIsDirty = false
+
+    companion object {
+
+        private var INSTANCE: RedditRepository? = null
+
+        /**
+         * Returns the single instance of this class, creating it if necessary.
+
+         * @param newsLocalDataSource the backend redditPost source
+         * @param newsLocalDataSource  the device storage redditPost source
+         * @return the [RedditRepository] instance
+         */
+        fun getInstance(newsRemoteDataSource: RedditDataSource,
+                        newsLocalDataSource: RedditDataSource, context: Context): RedditRepository {
+            if (INSTANCE == null) {
+                INSTANCE = RedditRepository(newsRemoteDataSource, newsLocalDataSource, context)
+            }
+            return INSTANCE!!
+        }
+
+    }
 
 
     init {
