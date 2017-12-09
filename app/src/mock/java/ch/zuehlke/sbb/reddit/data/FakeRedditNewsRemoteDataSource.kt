@@ -13,25 +13,41 @@ import ch.zuehlke.sbb.reddit.models.RedditPostsData
  * Created by chsc on 08.11.17.
  */
 
-class FakeRedditNewsRemoteDataSource// Prevent direct instantiation.
- constructor() : RedditDataSource {
+//TODO: kodein_exercise1: Verändere diese Klasse, so dass sie direkt instanziert werden kann. Entferne die Singleton Implementation
+
+class FakeRedditNewsRemoteDataSource
+/* Prevent direct instantiation.*/ private constructor() : RedditDataSource {
 
     private val REDDIT_NEWS_SERVICE_DATA = LinkedHashMap<String, RedditNewsData>()
 
+
+    companion object {
+
+        private var INSTANCE: FakeRedditNewsRemoteDataSource? = null
+
+
+        fun getInstance(): FakeRedditNewsRemoteDataSource{
+            if (INSTANCE == null) {
+                INSTANCE = FakeRedditNewsRemoteDataSource()
+            }
+            return INSTANCE!!
+        }
+    }
+
     override fun getMoreNews(callback: RedditDataSource.LoadNewsCallback) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun getPosts(callback: RedditDataSource.LoadPostsCallback, title: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun savePosts(data: RedditPostsData) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun deletePostsWithPermaLink(permaLink: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //To change body of created functions use File | Settings | File Templates.
     }
 
 

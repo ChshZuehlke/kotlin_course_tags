@@ -2,32 +2,30 @@ package ch.zuehlke.sbb.reddit.data.source.remote
 
 import android.content.Context
 import android.util.Log
-
-import com.google.common.base.Strings
-
-import java.io.IOException
-import java.util.ArrayList
-import java.util.Date
-
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.model.news.RedditNewsAPIResponse
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
+import com.google.common.base.Preconditions.checkNotNull
+import com.google.common.base.Strings
+import com.google.gson.Gson
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
 import java.lang.reflect.Type
-
-import com.google.common.base.Preconditions.checkNotNull
-import com.google.gson.Gson
+import java.util.*
 
 /**
  * Created by chsc on 08.11.17.
  */
 
-class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
+//TODO: kodein_exercise1: Verändere diese Klasse, so dass sie direkt instanziert werden kann. Entferne die Singleton Implementation
+
+class RedditNewsDataRemoteDataSource // Prevent direct instantiation.
+private constructor(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
     private var after = ""
     private var order = -1
     private val mRedditAPI: RedditAPI
@@ -41,6 +39,19 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
         mGson = gson
         mType = type
 
+    }
+
+
+    companion object {
+
+        private var INSTANCE: RedditNewsDataRemoteDataSource? = null
+
+        fun getInstance(context: Context, redditAPI: RedditAPI, gson: Gson, type: Type): RedditNewsDataRemoteDataSource {
+            if (INSTANCE == null) {
+                INSTANCE = RedditNewsDataRemoteDataSource(context, redditAPI, gson, type)
+            }
+            return INSTANCE!!
+        }
     }
 
 
@@ -58,7 +69,7 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
                         redditNewsDataList.add(RedditNewsData(data.author!!, data.title!!, data.num_comments, data.created, data.thumbnail!!, data.url!!, data.id!!, data.permalink!!))
 
                     }
-                     }
+                }
                 callback.onNewsLoaded(redditNewsDataList)
             }
 
@@ -175,7 +186,7 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
         try {
             redditPostElements = mGson.fromJson<List<RedditPostElement>>(response.string(), mType)
         } catch (e: IOException) {
-           Log.e(TAG,"Error while parsing respone $e")
+            Log.e(TAG,"Error while parsing respone $e")
         }
 
         return redditPostElements!!
@@ -193,4 +204,7 @@ class RedditNewsDataRemoteDataSource constructor(context: Context, redditAPI: Re
     override fun saveRedditNews(data: RedditNewsData) {
         // In this demo app we do not support posting of news, therefore not implemented.
     }
+
 }
+
+

@@ -18,6 +18,7 @@ class OverviewActivity : AppCompatActivity(), ActivityInjector {
 
     override val injector: KodeinInjector = KodeinInjector()
 
+    //TODO: kodein_exercise1: Benutze Kodein um das RedditRepository abzurufen.
     val redditRepository: RedditRepository by instance()
 
     private var mOverviewPresenter: OverviewPresenter? = null

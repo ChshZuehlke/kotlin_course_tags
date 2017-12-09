@@ -6,6 +6,7 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.data.source.RedditRepository
+import ch.zuehlke.sbb.reddit.data.source.remote.RedditNewsDataRemoteDataSource
 import ch.zuehlke.sbb.reddit.util.ActivityUtils
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.ActivityInjector
@@ -20,7 +21,8 @@ class DetailActivity : AppCompatActivity(), ActivityInjector {
 
     override val injector: KodeinInjector = KodeinInjector()
 
-    val redditRepository: RedditRepository by instance()
+    //TODO: kodein_exercise1: Benutze Kodein um das RedditRepository abzurufen.
+
 
     private var mOverviewPresenter: DetailPresenter? = null
 
@@ -28,6 +30,7 @@ class DetailActivity : AppCompatActivity(), ActivityInjector {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         initializeInjector()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
@@ -35,6 +38,8 @@ class DetailActivity : AppCompatActivity(), ActivityInjector {
         setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
         val ab = supportActionBar
         ab!!.setDisplayHomeAsUpEnabled(false)
+
+
 
         val redditUrl = intent.getStringExtra(EXTRA_REDDIT_NEWS_URL)
         Log.i(TAG, "RedditUrl: " + redditUrl)

@@ -25,10 +25,8 @@ fun createBaseModule(context: Context) = Kodein.Module{
                 .create()
     }
 
-    bind<RedditRepository>() with singleton {
-                RedditRepository(
-                        FakeRedditNewsRemoteDataSource(),
-                        RedditNewsLocalDataSource(context),
-                        context)
-    }
+    //TODO: kodein_exercise1: Bind die FakeRedditNewsRemoteDataSource und die RedditNewsLocalDataSource mit einem Singleton
+
+    //TODO: kodein_exercise1: Binde die RedditRepository mit einem Singleton. Benutze die transitive abhängigkeit von Kodein um sie zu instanzieren.
+
 }
