@@ -6,6 +6,7 @@ import android.support.design.widget.TextInputEditText
 import android.support.v7.widget.AppCompatButton
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,9 @@ import ch.zuehlke.sbb.reddit.features.news.NewsActivity
 import com.github.salomonbrys.kodein.instance
 import com.github.salomonbrys.kodein.with
 import com.google.common.base.Strings
+import io.reactivex.Observable
+import io.reactivex.ObservableOnSubscribe
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_login.*
 
 /**
@@ -32,25 +36,28 @@ class LoginFragment : BaseFragment(), LoginContract.View {
 
     private val loginListener = View.OnClickListener { mPresenter!!.login(username.text.toString(), password.text.toString()) }
 
-    private val usernameListener = object: TextWatcher{
-        override fun afterTextChanged(editable: Editable) {
-            if (editable.length > 0 && verifyIsEmail(editable.toString())) {
-                username!!.error = null
-            } else {
-                username!!.error = getString(R.string.login_screen_invalid_email)
+    private var disposable : Disposable? = null
+    private val usernameObservable = Observable.create(ObservableOnSubscribe<String> { emitter ->
+        val usernameListener = object : TextWatcher {
+            override fun afterTextChanged(editable: Editable) {
+                emitter.onNext(editable.toString())
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                // Do nothing
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                // Do nothing
             }
         }
-
-        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            // Do nothing
+        username.addTextChangedListener(usernameListener)
+        emitter.setCancellable {
+            username.removeTextChangedListener(usernameListener)
         }
+    })
 
-        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            // Do nothing
-        }
-    }
-
-    private val passwordListener = object : TextWatcher{
+    private val passwordListener = object : TextWatcher {
 
         override fun afterTextChanged(editable: Editable) {
             if (verifyPasswordLength(editable.toString())) {
@@ -59,8 +66,9 @@ class LoginFragment : BaseFragment(), LoginContract.View {
                 password!!.error = getString(R.string.login_screen_invalid_password_length)
             }
         }
+
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-           // DO nothing
+            // DO nothing
         }
 
 
@@ -74,13 +82,19 @@ class LoginFragment : BaseFragment(), LoginContract.View {
 
         mPresenter.start()
         loginButton.setOnClickListener(loginListener)
-        username.addTextChangedListener(usernameListener)
+        disposable = usernameObservable.subscribe { s ->
+            if (s.length > 0 && verifyIsEmail(s)) {
+                username!!.error = null
+            } else {
+                username!!.error = getString(R.string.login_screen_invalid_email)
+            }
+        }
         password.addTextChangedListener(passwordListener)
     }
 
     override fun onPause() {
         loginButton.setOnClickListener(null)
-        username.removeTextChangedListener(usernameListener)
+        disposable?.dispose()
         password.removeTextChangedListener(passwordListener)
 
         super.onPause()
@@ -88,7 +102,7 @@ class LoginFragment : BaseFragment(), LoginContract.View {
 
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
-            = LayoutInflater.from(context).inflate(R.layout.fragment_login,container,false)
+            = LayoutInflater.from(context).inflate(R.layout.fragment_login, container, false)
 
 
     override val isActive: Boolean
@@ -122,7 +136,6 @@ class LoginFragment : BaseFragment(), LoginContract.View {
         val matcher = android.util.Patterns.EMAIL_ADDRESS.matcher(email)
         return matcher.matches()
     }
-
 
 
     companion object {
