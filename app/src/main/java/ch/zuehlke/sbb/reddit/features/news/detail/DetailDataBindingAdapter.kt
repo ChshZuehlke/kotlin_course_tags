@@ -1,6 +1,7 @@
 package ch.zuehlke.sbb.reddit.features.news.detail
 
 import android.databinding.BindingAdapter
+import ch.zuehlke.sbb.reddit.extensions.friendlyTime
 
 /**
  * Created by chsc on 16.11.17.
@@ -12,7 +13,7 @@ object DetailDataBindingAdapter {
     @JvmStatic
     @BindingAdapter("friendlyTime")
     fun setFriendlyTime(textView: android.widget.TextView, date: Long){
-        textView.text = ch.zuehlke.sbb.reddit.util.DateUtils.friendlyTime(date)
+        textView.text = date.friendlyTime()
     }
 
     @JvmStatic

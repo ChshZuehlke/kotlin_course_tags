@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import android.widget.TextView
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.util.DateUtils
+import ch.zuehlke.sbb.reddit.extensions.friendlyTime
 import com.google.common.base.Strings
 import com.squareup.picasso.Picasso
 
@@ -33,7 +33,7 @@ object RedditNewsBindingAdapter{
     @JvmStatic
     @BindingAdapter("friendlyTime")
     fun setFriendlyTime(textView: TextView, date: Long){
-        textView.text = DateUtils.friendlyTime(date)
+        textView.text = date.friendlyTime()
     }
 
 }
