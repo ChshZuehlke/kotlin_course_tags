@@ -43,7 +43,8 @@ class RedditNewsDataRemoteDataSourceTest {
         //then
         subscriber.assertNever(ArrayList<RedditNewsData>())
         Assert.assertTrue(subscriber.values().size>0)
-        Assert.assertTrue(subscriber.values().get(0).size>0)
+        //Reddit API gibt mehr als 10 posts zurück
+        Assert.assertTrue(subscriber.values().get(0).size>10)
     }
 
 
@@ -58,6 +59,7 @@ class RedditNewsDataRemoteDataSourceTest {
         //then
         observer.assertComplete()
         observer.assertNoErrors()
+
         Assert.assertTrue(observer.values().size>0)
         Assert.assertTrue(observer.values().get(0).size>0)
     }
