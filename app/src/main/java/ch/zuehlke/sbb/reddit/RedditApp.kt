@@ -18,6 +18,7 @@ class RedditApp : Application(), KodeinAware{
 
     override fun onCreate() {
         super.onCreate()
+        //TODO: kodein_exercise2b
 
     }
 }

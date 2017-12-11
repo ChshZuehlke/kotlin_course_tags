@@ -11,6 +11,7 @@ import com.github.salomonbrys.kodein.scopedSingleton
  */
 fun createNewsActivityModule(appCompatActivity: AppCompatActivity, fragmentContainerId: Int) = Kodein.Module{
 
+    //TODO: kodein_exercise2b: Binde so, dass es im OverviewFragment keinen Fehler mehr wirft!
     bind<NavigationController>() with scopedSingleton(androidActivityScope){
         NavigationController(appCompatActivity,fragmentContainerId)
     }

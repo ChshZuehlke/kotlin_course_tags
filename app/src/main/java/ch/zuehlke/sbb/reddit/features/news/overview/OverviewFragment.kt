@@ -28,7 +28,7 @@ class OverviewFragment : BaseFragment(), OverviewContract.View {
 
     //Injections
     private val mOverviewPresenter: OverviewContract.Presenter by with(this@OverviewFragment).instance() //We could also call injector.with...
-    private val mNavigationController: NavigationController by with(this.activity).instance() //TODO: Gibt einen Fehler, die Activity ist noch nicht bereit!!
+    private val mNavigationController: NavigationController by with(this.activity).instance() //TODO: kodein_exercise2b: Gibt einen Fehler, die Activity ist noch nicht bereit!!
     private val mOverviewAdapter: RedditOverviewAdapter by with(this@OverviewFragment).instance() //We could also call injector.with...
 
     private var mNoNewsView: View? = null

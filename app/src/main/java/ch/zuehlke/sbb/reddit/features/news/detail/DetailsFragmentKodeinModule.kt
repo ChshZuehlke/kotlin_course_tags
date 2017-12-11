@@ -10,13 +10,12 @@ import com.github.salomonbrys.kodein.scopedSingleton
 /**
  * Created by celineheldner on 17.11.17.
  */
-fun createNewsDetailsModule(view: DetailContract.View, redditUrl: String) = Kodein.Module{
+fun createNewsDetailsModule(view: DetailContract.View) = Kodein.Module{
 
-    bind<DetailContract.Presenter>() with scopedSingleton(androidSupportFragmentScope){
-        DetailPresenter(view,instance(), it.arguments.getString(redditUrl))
-    }
+    //TODO: kodein_exercise2a: binde den DetailAdapter mit einem AndroidSupportFragment Scoped Singleton
 
-    bind<DetailAdapter>() with scopedSingleton(androidSupportFragmentScope){
-        DetailAdapter(it.context)
-    }
+    val redditUrlBundleKey = DetailFragment.EXTRA_REDDIT_NEWS_URL
+    //TODO: kodein_exercise2a: binde den DetailContract.Presenter mit einem AndroidSupportFragment Scoped Singleton.
+    //TODO: kodein_exercise2a: Hint: Die RedditUrl wird im Intent Bundle mit dem Key: "redditUrlBundleKey"  mitgegeben
+
 }
