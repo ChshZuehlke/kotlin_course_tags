@@ -1,6 +1,5 @@
 package ch.zuehlke.sbb.reddit.data.source.remote
 
-import android.content.Context
 import android.util.Log
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
@@ -23,13 +22,12 @@ import java.lang.reflect.Type
  * Created by chsc on 08.11.17.
  */
 
-class RedditNewsDataRemoteDataSource constructor(val context: Context, val redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
+class RedditNewsDataRemoteDataSource constructor(val redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
     private var order = -1
     private val mGson: Gson
     private val mType: Type
 
     init {
-        checkNotNull(context)
         checkNotNull(redditAPI, { "The reddit API cannot be null" })
         mGson = gson
         mType = type

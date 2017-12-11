@@ -55,7 +55,7 @@ fun createBaseModule(context: Context) = Kodein.Module{
      * Binding the two Datasources as Singletons
      * Needs Tagging to differentiate the instances
      */
-    bind<RedditDataSource>("remoteDS") with singleton { RedditNewsDataRemoteDataSource(context, instance(),instance(), type) }
+    bind<RedditDataSource>("remoteDS") with singleton { RedditNewsDataRemoteDataSource(instance(),instance(), type) }
     bind<RedditDataSource>("localDS") with singleton { RedditNewsLocalDataSource(context, instance()) }
 
     /**

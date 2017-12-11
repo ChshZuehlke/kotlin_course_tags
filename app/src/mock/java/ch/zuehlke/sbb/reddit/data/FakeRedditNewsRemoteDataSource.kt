@@ -1,13 +1,14 @@
 package ch.zuehlke.sbb.reddit.data
 
 import android.support.annotation.NonNull
-import com.google.common.collect.Lists
 
 import java.util.LinkedHashMap
 
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
+import io.reactivex.Flowable
+import io.reactivex.Observable
 
 /**
  * Created by chsc on 08.11.17.
@@ -15,16 +16,14 @@ import ch.zuehlke.sbb.reddit.models.RedditPostsData
 
 class FakeRedditNewsRemoteDataSource// Prevent direct instantiation.
  constructor() : RedditDataSource {
+    override val news: Flowable<List<RedditNewsData>>
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    override fun posts(permalink: String): Observable<List<RedditPostsData>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     private val REDDIT_NEWS_SERVICE_DATA = LinkedHashMap<String, RedditNewsData>()
-
-    override fun getMoreNews(callback: RedditDataSource.LoadNewsCallback) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getPosts(callback: RedditDataSource.LoadPostsCallback, title: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     override fun savePosts(data: List<RedditPostsData>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -32,11 +31,6 @@ class FakeRedditNewsRemoteDataSource// Prevent direct instantiation.
 
     override fun deletePostsWithPermaLink(permaLink: String) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-
-    override fun getNews(@NonNull callback: RedditDataSource.LoadNewsCallback) {
-        callback.onNewsLoaded(Lists.newArrayList(REDDIT_NEWS_SERVICE_DATA.values))
     }
 
     override fun refreshNews() {
