@@ -27,9 +27,9 @@ class OverviewFragment : BaseFragment(), OverviewContract.View {
     override fun provideOverridingModule() = createNewsOverviewModule(this@OverviewFragment,listener)
 
     //Injections
-    private val mOverviewPresenter: OverviewContract.Presenter by injector.with(this@OverviewFragment).instance()
-    private val mNavigationController: NavigationController by injector.instance()
-    private val mOverviewAdapter: RedditOverviewAdapter by injector.with(this@OverviewFragment).instance()
+    private val mOverviewPresenter: OverviewContract.Presenter by with(this@OverviewFragment).instance() //We could also call injector.with...
+    private val mNavigationController: NavigationController by instance() //We could also call injector.insance()
+    private val mOverviewAdapter: RedditOverviewAdapter by with(this@OverviewFragment).instance() //We could also call injector.with...
 
     private var mNoNewsView: View? = null
     private var mNewsView: RecyclerView? = null

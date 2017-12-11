@@ -26,8 +26,8 @@ class DetailFragment: BaseFragment(), DetailContract.View {
 
     override fun provideOverridingModule() = createNewsDetailsModule(this@DetailFragment,EXTRA_REDDIT_NEWS_URL)
     //injected
-    private val mPresenter: DetailContract.Presenter by injector.with(this@DetailFragment).instance()
-    private val mAdapter: DetailAdapter by injector.with(this@DetailFragment).instance()
+    private val mPresenter: DetailContract.Presenter by with(this@DetailFragment).instance() //We could also call injector.with but injector can be omitted
+    private val mAdapter: DetailAdapter by with(this@DetailFragment).instance()
 
     private var mPostView: RecyclerView? = null
     private var mNoPostView: View? = null
