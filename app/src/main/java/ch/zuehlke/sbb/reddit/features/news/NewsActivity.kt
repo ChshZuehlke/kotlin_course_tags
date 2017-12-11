@@ -17,7 +17,7 @@ class NewsActivity : BaseActivity() {
 
     override fun provideOverridingModule() = createNewsActivityModule(this@NewsActivity, R.id.contentFrame)
 
-    private val mNavigationController: NavigationController by injector.instance()
+    private val mNavigationController: NavigationController by injector.with(this).instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
