@@ -1,11 +1,11 @@
 package ch.zuehlke.sbb.reddit.data.source.remote
 
-import android.util.Log
 import ch.zuehlke.sbb.reddit.data.source.RedditDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPost
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
+import ch.zuehlke.sbb.reddit.util.LoggerInterface
 import com.google.common.base.Strings
 import com.google.gson.Gson
 import io.reactivex.Emitter
@@ -22,44 +22,46 @@ import java.lang.reflect.Type
  * Created by chsc on 08.11.17.
  */
 
-class RedditNewsDataRemoteDataSource constructor(val redditAPI: RedditAPI, gson: Gson, type: Type) : RedditDataSource {
+class RedditNewsDataRemoteDataSource constructor(val redditAPI: RedditAPI, gson: Gson, type: Type, logger: LoggerInterface) : RedditDataSource {
     private var order = -1
     private val mGson: Gson
     private val mType: Type
+    private val mLogger: LoggerInterface
 
     init {
         checkNotNull(redditAPI, { "The reddit API cannot be null" })
         mGson = gson
         mType = type
+        mLogger = logger
     }
 
     override val news: Flowable<List<RedditNewsData>>
         get() {
-            Log.d(TAG, "Creating a reddit news data flowable")
+            mLogger.d(TAG, "Creating a reddit news data flowable")
             return Flowable.generate(
                     {
-                        Log.d(TAG, "Subscription started on thread ${Thread.currentThread().name}")
+                        mLogger.d(TAG, "Subscription started on thread ${Thread.currentThread().name}")
                         ""
                     },
                     fun(next: String, emitter: Emitter<List<RedditNewsData>>): String {
-                        Log.d(TAG, "Next page id available: '$next'")
+                        mLogger.d(TAG, "Next page id available: '$next'")
 
                         val requestNews = requestNews(next).subscribeOn(Schedulers.io())
 
-                        Log.d(TAG, "Waiting for the response on thread ${Thread.currentThread().name}")
+                        mLogger.d(TAG, "Waiting for the response on thread ${Thread.currentThread().name}")
                         requestNews.subscribeBy(
                                 onSuccess = { (news, _) ->
-                                    Log.d(TAG, "Received page")
+                                    mLogger.d(TAG, "Received page")
                                     emitter.onNext(news.mapNotNull { it })
                                 },
                                 onError = { error ->
-                                    Log.e(TAG, "Problem when receiving page: $error")
+                                    mLogger.e(TAG, "Problem when receiving page: $error")
                                     emitter.onError(error)
                                 })
                         try {
                             return requestNews.blockingGet().second ?: ""
                         } catch (error: Exception) {
-                            Log.e(TAG, "Problem when receiving the next pages tag: $error")
+                            mLogger.e(TAG, "Problem when receiving the next pages tag: $error")
                             emitter.onError(error)
                             return ""
                         }
@@ -81,7 +83,7 @@ class RedditNewsDataRemoteDataSource constructor(val redditAPI: RedditAPI, gson:
     override fun posts(permalink: String): Observable<List<RedditPostsData>> {
         return redditAPI.getRedditPosts(permalink, "new")
                 .map { response ->
-                    Log.d(TAG, "Loading posts on ${Thread.currentThread().name}")
+                    mLogger.d(TAG, "Loading posts on ${Thread.currentThread().name}")
                     try {
                         val redditPostElements: List<RedditPostElement> = mGson.fromJson<List<RedditPostElement>>(response.string(), mType)
                         flattenRetrofitResponse(redditPostElements, permalink)

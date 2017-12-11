@@ -10,6 +10,7 @@ import ch.zuehlke.sbb.reddit.data.source.remote.RedditNewsDataRemoteDataSource
 import ch.zuehlke.sbb.reddit.data.source.remote.model.posts.RedditPostElement
 import ch.zuehlke.sbb.reddit.util.ConfigurableLogger
 import ch.zuehlke.sbb.reddit.util.LoggerInterface
+import ch.zuehlke.sbb.reddit.util.TestLogger
 import com.github.salomonbrys.kodein.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -23,7 +24,7 @@ import java.lang.reflect.Modifier
  * Created by celineheldner on 15.11.17.
  */
 
-fun createBaseModule(context: Context) = Kodein.Module{
+fun createBaseModule() = Kodein.Module{
 
     val REDDIT_END_POINT = "https://www.reddit.com/r/dota2/"
 
@@ -52,7 +53,7 @@ fun createBaseModule(context: Context) = Kodein.Module{
                 .create()
     }
 
-    bind<LoggerInterface>() with singleton{ ConfigurableLogger()}
+    bind<LoggerInterface>() with singleton{ TestLogger() }
 
     /**
      * The Datasources don't need to be implemented as singletons anymore. Kodein can handle that
@@ -60,18 +61,18 @@ fun createBaseModule(context: Context) = Kodein.Module{
      * Needs Tagging to differentiate the instances
      */
     bind<RedditDataSource>("remoteDS") with singleton { RedditNewsDataRemoteDataSource(instance(),instance(), type, instance()) }
-    bind<RedditDataSource>("localDS") with singleton { RedditNewsLocalDataSource(context, instance()) }
+    /** bind<RedditDataSource>("localDS") with singleton { RedditNewsLocalDataSource(context, instance()) }
 
-    /**
+    *
      * the RedditRepository does not need to be implemented as a singleton -> Kodein can handle that
      * Retrievs the two DataSource-Instances bound previously using a tag
-     */
+
     bind<RedditRepository>() with eagerSingleton {
         RedditRepository(
                 instance("remoteDS"),
                 instance("localDS"),
                 context)
-    }
+    }*/
 
 
 }
