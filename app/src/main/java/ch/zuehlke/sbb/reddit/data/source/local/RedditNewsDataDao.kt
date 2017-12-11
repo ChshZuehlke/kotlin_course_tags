@@ -14,13 +14,13 @@ import ch.zuehlke.sbb.reddit.models.RedditNewsData
 interface RedditNewsDataDao{
 
 
-    @Query("select * from RedditNewsData")
+    //TODO: room_exercise1: Füge die nötige Room Annotation hinzu
     fun getNews(): List<RedditNewsData>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    //TODO: room_exercise1: Füge die nötige Room Annotation hinzu
     fun addNewsItem(item: List<RedditNewsData>)
 
-    @Query("delete from RedditNewsData")
+    //TODO: room_exercise1: Füge die nötige Room Annotation hinzu
     fun deleteNews()
 
 
