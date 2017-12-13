@@ -33,12 +33,11 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
         // Simulate a 'long' network call to verify the credentials
 
         launch(UI) {
-            delay(1000, TimeUnit.MILLISECONDS) //TODO: Use this delay in the validation of the username
             if (mLoginView.isActive) {
 
                 var hasError = false
-                // TODO: Validate the username asynchrounous - validate the username in a function and simulate a long running operation using delay
-                if (userEmail != "test.tester@test.com") {
+                // Validate the username asynchrounous - validate the username in a function and simulate a long running operation using delay
+                if (validateUsername(userEmail)) {
                     mLoginView.showInvalidUsername()
                     hasError = true
                 }
@@ -56,6 +55,11 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
                 }
             }
         }
+    }
+
+    suspend private fun validateUsername(userEmail: String): Boolean {
+        delay(1000, TimeUnit.MILLISECONDS)
+        return userEmail != "test.tester@test.com"
     }
 
 
