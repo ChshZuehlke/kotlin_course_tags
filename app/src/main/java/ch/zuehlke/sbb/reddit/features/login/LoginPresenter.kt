@@ -33,7 +33,7 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
         // Simulate a 'long' network call to verify the credentials
 
         launch(UI) {
-            delay(1000, TimeUnit.MILLISECONDS)
+            delay(1000, TimeUnit.MILLISECONDS) //TODO: Use this delay in the validation of the username
             if (mLoginView.isActive) {
 
                 var hasError = false
@@ -51,7 +51,9 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
                 if (!hasError) {
                     mLoginView.showRedditNews()
                 }
-                mLoginView.setLoadingIndicator(false)
+                if (mLoginView.isActive) {
+                    mLoginView.setLoadingIndicator(false)
+                }
             }
         }
     }
