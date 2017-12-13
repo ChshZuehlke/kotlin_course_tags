@@ -20,8 +20,10 @@ import com.github.salomonbrys.kodein.with
 import com.google.common.base.Strings
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_login.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by chsc on 08.11.17.
@@ -82,7 +84,10 @@ class LoginFragment : BaseFragment(), LoginContract.View {
 
         mPresenter.start()
         loginButton.setOnClickListener(loginListener)
-        disposable = usernameObservable.subscribe { s ->
+        disposable = usernameObservable
+                .debounce(500,TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { s ->
             if (s.length > 0 && verifyIsEmail(s)) {
                 username!!.error = null
             } else {
