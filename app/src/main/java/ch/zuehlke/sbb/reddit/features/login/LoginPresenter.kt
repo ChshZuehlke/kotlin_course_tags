@@ -2,6 +2,7 @@ package ch.zuehlke.sbb.reddit.features.login
 
 import com.google.common.base.Preconditions.checkNotNull
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import java.util.concurrent.TimeUnit
@@ -36,18 +37,15 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
             if (mLoginView.isActive) {
 
                 var hasError = false
-                // Validate the username asynchrounous - use async
+                // TODO: Validate the username asynchrounous - validate the username in a function and simulate a long running operation using delay
                 if (userEmail != "test.tester@test.com") {
                     mLoginView.showInvalidUsername()
                     hasError = true
                 }
-
                 if (password != "123456") {
                     mLoginView.showInvalidPassword()
                     hasError = true
-
-                    mLoginView.showInvalidPasswordTimeout(10)
-                    delay(10, TimeUnit.SECONDS)
+                    // TODO: Block the use of the login using 'mLoginView.showInvalidPasswordTimeout' for 10 seconds
                 }
 
                 if (!hasError) {
