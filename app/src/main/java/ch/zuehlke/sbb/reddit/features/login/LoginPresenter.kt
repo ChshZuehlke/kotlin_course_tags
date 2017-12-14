@@ -44,7 +44,9 @@ class LoginPresenter(view: LoginContract.View) : LoginContract.Presenter {
                 if (password != "123456") {
                     mLoginView.showInvalidPassword()
                     hasError = true
-                    // TODO: Block the use of the login using 'mLoginView.showInvalidPasswordTimeout' for 10 seconds
+                    // Block the use of the login using 'mLoginView.showInvalidPasswordTimeout' for 10 seconds
+                    mLoginView.showInvalidPasswordTimeout(10)
+                    delay(10, TimeUnit.SECONDS)
                 }
 
                 if (!hasError) {
