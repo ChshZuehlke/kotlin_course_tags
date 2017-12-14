@@ -19,6 +19,10 @@ object  OverviewFragmentKodeinModule{
             OverviewPresenter(view, instance())
         }
 
+        // Excercise 01
+        // Add a compare function so that the redditnewsData objects can be compared
+        // against eachother by the DiffUtil.
+        // Caution, there is also a LoadingItem in the list
         bind<OverviewAdapter>() with scopedSingleton(androidSupportFragmentScope){
             OverviewAdapter(listener)
         }

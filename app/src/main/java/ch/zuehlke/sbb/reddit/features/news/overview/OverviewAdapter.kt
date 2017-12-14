@@ -15,8 +15,10 @@ import ch.zuehlke.sbb.reddit.models.RedditNewsData
 
 class OverviewAdapter(clickListener: GenericBindingViewHolder.GenericBindingClickListener): GenericBindingBaseAdapter(clickListener){
 
-
+    // Excercise 01
+    // Add a observable delegate and trigger the autoNotify method (You need to write the corresponding Extension)
     private val items = mutableListOf<ViewType>()
+
     private val viewTypeLayoutDelegate = SparseArrayCompat<Int>()
 
     init {
@@ -24,6 +26,8 @@ class OverviewAdapter(clickListener: GenericBindingViewHolder.GenericBindingClic
         viewTypeLayoutDelegate.put(AdapterConstants.NEWS, R.layout.item_overview)
     }
 
+    // Excersise 01
+    // Change both methods so that the DiffUtil can be triggered (Observables are working based on setters)
     fun addRedditNews(newsData: List<RedditNewsData>) {
         val initPosition = items.size - 1
         items.removeAt(initPosition)
