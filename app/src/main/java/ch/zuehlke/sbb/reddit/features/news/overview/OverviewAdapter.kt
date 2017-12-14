@@ -2,56 +2,52 @@ package ch.zuehlke.sbb.reddit.features.news.overview
 
 import android.support.v4.util.SparseArrayCompat
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.features.news.AdapterConstants
-import ch.zuehlke.sbb.reddit.features.news.GenericBindingBaseAdapter
-import ch.zuehlke.sbb.reddit.features.news.GenericBindingViewHolder
-import ch.zuehlke.sbb.reddit.features.news.ViewType
+import ch.zuehlke.sbb.reddit.features.news.*
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
+import kotlin.properties.Delegates
 
 /**
  * Created by chsc on 15.11.17.
  */
 
 
-class OverviewAdapter(clickListener: GenericBindingViewHolder.GenericBindingClickListener): GenericBindingBaseAdapter(clickListener){
+class OverviewAdapter(clickListener: GenericBindingViewHolder.GenericBindingClickListener,compare: (ViewType,ViewType)-> Boolean): GenericBindingBaseAdapter(clickListener),AutoUpdatableAdapter{
 
-    // Excercise 01
-    // Add a observable delegate and trigger the autoNotify method (You need to write the corresponding Extension)
-    private val items = mutableListOf<ViewType>()
+    private val loadingItem = object : ViewType {
+        override val viewType = AdapterConstants.LOADING
+    }
+
+    private var items : MutableList<ViewType> by Delegates.observable(mutableListOf(),{ _, oldValue, newValue ->
+        autoNotify(oldValue,newValue,compare)
+    })
 
     private val viewTypeLayoutDelegate = SparseArrayCompat<Int>()
 
     init {
         viewTypeLayoutDelegate.put(AdapterConstants.LOADING, R.layout.item_loading)
         viewTypeLayoutDelegate.put(AdapterConstants.NEWS, R.layout.item_overview)
+        items = mutableListOf(loadingItem)
     }
 
-    // Excersise 01
-    // Change both methods so that the DiffUtil can be triggered (Observables are working based on setters)
-    fun addRedditNews(newsData: List<RedditNewsData>) {
-        val initPosition = items.size - 1
-        items.removeAt(initPosition)
-        notifyItemRemoved(initPosition)
+    // Exercise 01
+    // Rewrite the both methods which set the new items and incorporate the
+    // DiffUtil class from google which handles all notifications for us.
 
-        items.addAll(newsData)
-        items.add(loadingItem)
-        notifyItemRangeChanged(initPosition, items.size + 1 /* plus loading item */)
+    fun addRedditNews(newsData: List<RedditNewsData>) {
+        val mergedList = mutableListOf<ViewType>()
+        mergedList.addAll(items)
+        mergedList.addAll(items.size-2,newsData)
+        items = mergedList
     }
 
     fun clearAndAddNews(newsData: List<RedditNewsData>) {
-
-        val previousItemSize = items.size
-        items.clear()
-        notifyItemRangeRemoved(0, previousItemSize)
-        items.addAll(newsData)
-        items.add(loadingItem)
-        notifyItemRangeChanged(0, newsData.size + 1 /* plus loading item */)
-
+       val mergedList = mutableListOf<ViewType>()
+        mergedList.addAll(newsData)
+        mergedList.add(loadingItem)
+        items = mergedList
     }
 
-    private val loadingItem = object : ViewType {
-        override val viewType = AdapterConstants.LOADING
-    }
+
 
     override fun getObjForPosition(position: Int): Any {
         return items[position]
