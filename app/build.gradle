@@ -1,6 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+// Excersise-DataBinding-01
+// Enable the kotlin annotation-processor
+apply plugin: 'kotlin-kapt'
+
+
 
 android {
     compileSdkVersion 26
@@ -46,6 +51,12 @@ android {
         }
     }
 
+    // Excersise-DataBinding-01
+    // enable Databinding.
+    dataBinding {
+        enabled = true
+    }
+
 
 }
 
@@ -88,6 +99,13 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+
+
+    // Excersise-DataBinding-01
+    // Add the annotation processor (kotlin -> "kapt" not "apt" or "annotationProcessor")
+    // for the databindin library
+    kapt "com.android.databinding:compiler:$plugin_version"
+
 
 }
 repositories {
