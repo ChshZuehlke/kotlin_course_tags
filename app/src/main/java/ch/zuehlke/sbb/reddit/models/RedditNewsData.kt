@@ -1,7 +1,7 @@
 package ch.zuehlke.sbb.reddit.models
 
-import ch.zuehlke.sbb.reddit.features.AdapterConstants
-import ch.zuehlke.sbb.reddit.features.ViewType
+import ch.zuehlke.sbb.reddit.features.news.AdapterConstants
+import ch.zuehlke.sbb.reddit.features.news.ViewType
 
 /**
  * Created by chsc on 08.11.17.

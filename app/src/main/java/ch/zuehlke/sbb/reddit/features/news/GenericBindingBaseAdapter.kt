@@ -1,4 +1,4 @@
-package ch.zuehlke.sbb.reddit.features
+package ch.zuehlke.sbb.reddit.features.news
 
 import android.databinding.DataBindingUtil
 import android.databinding.ViewDataBinding
@@ -20,7 +20,7 @@ abstract class GenericBindingBaseAdapter(val clickListener: GenericBindingViewHo
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): GenericBindingViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: ViewDataBinding = DataBindingUtil.inflate(inflater, viewType, parent, false)
-        return GenericBindingViewHolder(binding,clickListener)
+        return GenericBindingViewHolder(binding, clickListener)
     }
 
 

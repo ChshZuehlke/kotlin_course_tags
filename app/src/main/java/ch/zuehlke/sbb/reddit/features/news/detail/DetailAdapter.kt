@@ -1,10 +1,10 @@
 package ch.zuehlke.sbb.reddit.features.news.detail
 
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.features.AdapterConstants
-import ch.zuehlke.sbb.reddit.features.GenericBindingBaseAdapter
-import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
-import ch.zuehlke.sbb.reddit.features.ViewType
+import ch.zuehlke.sbb.reddit.features.news.AdapterConstants
+import ch.zuehlke.sbb.reddit.features.news.GenericBindingBaseAdapter
+import ch.zuehlke.sbb.reddit.features.news.GenericBindingViewHolder
+import ch.zuehlke.sbb.reddit.features.news.ViewType
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
 
 /**

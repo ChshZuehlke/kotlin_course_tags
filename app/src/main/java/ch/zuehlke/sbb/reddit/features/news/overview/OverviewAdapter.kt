@@ -2,10 +2,10 @@ package ch.zuehlke.sbb.reddit.features.news.overview
 
 import android.support.v4.util.SparseArrayCompat
 import ch.zuehlke.sbb.reddit.R
-import ch.zuehlke.sbb.reddit.features.AdapterConstants
-import ch.zuehlke.sbb.reddit.features.GenericBindingBaseAdapter
-import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
-import ch.zuehlke.sbb.reddit.features.ViewType
+import ch.zuehlke.sbb.reddit.features.news.AdapterConstants
+import ch.zuehlke.sbb.reddit.features.news.GenericBindingBaseAdapter
+import ch.zuehlke.sbb.reddit.features.news.GenericBindingViewHolder
+import ch.zuehlke.sbb.reddit.features.news.ViewType
 import ch.zuehlke.sbb.reddit.models.RedditNewsData
 
 /**
@@ -13,7 +13,7 @@ import ch.zuehlke.sbb.reddit.models.RedditNewsData
  */
 
 
-class ViewTypeAwareAdapter(clickListener: GenericBindingViewHolder.GenericBindingClickListener): GenericBindingBaseAdapter(clickListener){
+class OverviewAdapter(clickListener: GenericBindingViewHolder.GenericBindingClickListener): GenericBindingBaseAdapter(clickListener){
 
 
     private val items = mutableListOf<ViewType>()

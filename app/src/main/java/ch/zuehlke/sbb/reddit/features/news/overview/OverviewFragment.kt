@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.BaseFragment
-import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
+import ch.zuehlke.sbb.reddit.features.news.GenericBindingViewHolder
 import ch.zuehlke.sbb.reddit.features.news.NavigationController
 import ch.zuehlke.sbb.reddit.features.news.overview.OverviewFragmentKodeinModule.createNewsOverviewModule
 
@@ -30,7 +30,7 @@ class OverviewFragment : BaseFragment(), OverviewContract.View {
     //Injections
     private val mOverviewPresenter: OverviewContract.Presenter by injector.with(this@OverviewFragment).instance()
     private val mNavigationController: NavigationController by injector.instance()
-    private val mOverviewAdapter: ViewTypeAwareAdapter by injector.with(this@OverviewFragment).instance()
+    private val mOverviewAdapter: OverviewAdapter by injector.with(this@OverviewFragment).instance()
 
     private val clickListener =  object: GenericBindingViewHolder.GenericBindingClickListener{
         override fun onItemSelected(obj: Any) {

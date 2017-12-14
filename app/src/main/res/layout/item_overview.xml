@@ -10,7 +10,7 @@
 
         <variable
             name="listener"
-            type="ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder.GenericBindingClickListener"/>
+            type="ch.zuehlke.sbb.reddit.features.news.GenericBindingViewHolder.GenericBindingClickListener"/>
     </data>
 
 

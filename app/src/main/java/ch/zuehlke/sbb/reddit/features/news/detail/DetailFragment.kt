@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import ch.zuehlke.sbb.reddit.R
 import ch.zuehlke.sbb.reddit.features.BaseFragment
-import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
+import ch.zuehlke.sbb.reddit.features.news.GenericBindingViewHolder
 import ch.zuehlke.sbb.reddit.features.news.detail.DetailsFragmentKodeinModule.createNewsDetailsModule
 import ch.zuehlke.sbb.reddit.models.RedditPostsData
 import com.github.salomonbrys.kodein.instance

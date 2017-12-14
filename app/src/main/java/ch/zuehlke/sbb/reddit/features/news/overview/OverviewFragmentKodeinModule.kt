@@ -1,6 +1,6 @@
 package ch.zuehlke.sbb.reddit.features.news.overview
 
-import ch.zuehlke.sbb.reddit.features.GenericBindingViewHolder
+import ch.zuehlke.sbb.reddit.features.news.GenericBindingViewHolder
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.android.androidSupportFragmentScope
 import com.github.salomonbrys.kodein.bind
@@ -19,8 +19,8 @@ object  OverviewFragmentKodeinModule{
             OverviewPresenter(view, instance())
         }
 
-        bind<ViewTypeAwareAdapter>() with scopedSingleton(androidSupportFragmentScope){
-            ViewTypeAwareAdapter(listener)
+        bind<OverviewAdapter>() with scopedSingleton(androidSupportFragmentScope){
+            OverviewAdapter(listener)
         }
     }
 }
