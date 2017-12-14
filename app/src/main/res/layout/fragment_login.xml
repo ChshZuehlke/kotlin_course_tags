@@ -1,29 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Excersise-DataBinding-01
-Enclose the root the layout with the layout tag and
-introduce an editext which shows the strength of the
-entered password
+Enclose the root layout with the layout tag
 -->
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
 
-
-    <data>
-        <variable
-            name="passwordViewModel"
-            type="ch.zuehlke.sbb.reddit.features.login.PasswordViewModel"/>
-    </data>
-
-
-<RelativeLayout
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:background="@color/colorBackground"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
     >
 
+    <!-- Excersise-DataBinding-01
+        import your viewmodel which holds the observables
+     -->
 
 
     <RelativeLayout
@@ -78,10 +67,9 @@ entered password
             -->
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/passwordLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
 
-                >
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/password"
@@ -91,25 +79,12 @@ entered password
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/login_screen_password_hint"
-                    app:textChangedListener="@{passwordViewModel.passwordTextWatcher}"
-                    app:errorText="@{passwordViewModel.passwordError}"
-
                     />
-
 
             </android.support.design.widget.TextInputLayout>
 
             <!-- Excersise-DataBinding-01
-                Add a new textfield which shows the passwordQuality of the viewmodel  -->
-
-
-            <TextView
-                android:id="@+id/passwordStrengthIndicator"
-                android:textColor="@android:color/holo_red_dark"
-                android:text = "@{passwordViewModel.passwordQuality}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
+              Add a new textfield which shows the passwordQuality of the viewmodel  -->
 
 
             <android.support.v7.widget.AppCompatButton
@@ -159,4 +134,3 @@ entered password
 
 
 </RelativeLayout>
-</layout>

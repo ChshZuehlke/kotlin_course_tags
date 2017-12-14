@@ -19,10 +19,6 @@ object LoginActivityKodeinModule {
 
         // Excersise-DataBinding-01
         // Provide an instance of the PasswordViewModel
-        bind<PasswordViewModel>() with scopedSingleton(androidSupportFragmentScope){
-            PasswordViewModel(it.context)
-        }
-
     }
 }
 

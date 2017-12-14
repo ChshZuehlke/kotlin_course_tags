@@ -3,7 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 // Excersise-DataBinding-01
 // Enable the kotlin annotation-processor
-apply plugin: 'kotlin-kapt'
 
 
 
@@ -50,14 +49,6 @@ android {
             resources.srcDirs += ['src/test/resources']
         }
     }
-
-    // Excersise-DataBinding-01
-    // enable Databinding.
-    dataBinding {
-        enabled = true
-    }
-
-
 }
 
 androidExtensions {
@@ -104,7 +95,6 @@ dependencies {
     // Excersise-DataBinding-01
     // Add the annotation processor (kotlin -> "kapt" not "apt" or "annotationProcessor")
     // for the databindin library
-    kapt "com.android.databinding:compiler:$plugin_version"
 
 
 }

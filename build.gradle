@@ -5,7 +5,6 @@ buildscript {
     // Excersise-DataBinding-01
     // The version of the  databinding library must the same as the gradle plugin
     // Introduce a common version property for the gradle plugin version
-    ext.plugin_version = '3.0.0'
     repositories {
         google()
         jcenter()
